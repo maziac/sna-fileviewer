@@ -88,26 +88,38 @@ export class SnaView {
 		html += this.htmlByte("IM");
 		html += this.htmlWord("HL'");
 
-		html += this.htmlMemDump("4000-7FFF", 0x4000);
-		html += this.htmlMemDump("8000-BFFF", 0x4000);
-		html += this.htmlMemDump("C000-FFFF", 0x4000);
+		html += this.htmlMemDump("Bank5: 4000-7FFF", 0x4000);
+		html += this.htmlMemDump("Bank2: 8000-BFFF", 0x4000);
+		html += this.htmlMemDump("Bank?: C000-FFFF", 0x4000);
 
 
 		// Check for 128k
-		if (this.data.length > 49179) {
+		if (this.data.length <= SNA_HEADER_LENGTH) {
 			// ZX 48k, get PC from SP
+			let pc;
 			if (sp >= 0x4000) {
 				const pcIndex = SNA_HEADER_LENGTH + sp - 0x4000;
 				const pc = this.data[pcIndex];
-				html += this.htmlTitleValue("Derived from data at address " + this.getHexWordString(sp) + " -> PC", pc);
 			}
-			else {
-				// SP points to ROM
-				html += this.htmlTitleValue("Derived from data at address " + this.getHexWordString(sp) + " -> PC", undefined);
-			}
+			html += this.htmlTitleValue("PC", pc, DataType.HEX_WORD, "Derived from data at address SP=" + this.getHexWordString(sp) );
 		}
 		else {
+			// ZX 128K SNA
+			const port7ffd = this.readByte();
+			html += this.htmlTitleValue("Port 7FFD", port7ffd);
+			html += this.htmlByte("TR DOS ROM");
 
+			// 3rd bank
+			const pagedInBank = port7ffd & 0x03;
+
+			// Read 6 more memory banks
+			for (let i = 2; i < 8; i++) {
+				const bank = this.getMemBankPermutation(i);
+				if (bank == pagedInBank)
+					continue;	// skip already read bank
+				// Get memory data
+				html += this.htmlMemDump("Bank"+bank, 0x4000);
+			}
 		}
 
 
@@ -159,7 +171,7 @@ ${html}
 	 * @param dataType How to convert. As HEX or INT.
 	 * @returns The html describing title and value.
 	 */
-	protected htmlTitleValue(title: string, value: number, dataType = DataType.HEX_WORD) {
+	protected htmlTitleValue(title: string, value: number, dataType = DataType.HEX_WORD, hoverString?: string) {
 		let valString;
 		let valIntString;
 		let titleString = '';
@@ -184,11 +196,13 @@ ${html}
 			}
 		}
 		//const html = `<div>${title} = ${valHexString}</div>`;
+		if (hoverString == undefined)
+			hoverString = '';
 		const html = `
-<div class='simple_value' title="${titleString}">
-<div class='simple_value_title'>${title}:</div>
+<div class='simple_value'>
+<div class='simple_value_title' title="${hoverString}">${title}:</div>
 <div>&nbsp;</div>
-<div>${valString}</div>
+<div title="${titleString}">${valString}</div>
 </div>
 `;
 		return html;
@@ -311,5 +325,16 @@ ${prevClose}
 		return value;
 	}
 
+
+	/**
+	 * Returns the right bank for an index.
+	 *  5,2,0,1,3,4,6,7,8,9,10,...,111.
+	 * @returns the bank number 0-111.
+	 */
+	public getMemBankPermutation(i: number) {
+		if (i >= 6)
+			return i;
+		return [5, 2, 0, 1, 3, 4][i];
+	}
 }
 
