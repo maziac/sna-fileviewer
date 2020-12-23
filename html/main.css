@@ -1,1 +1,22 @@
 
+	.simple_value {
+		display: table-row;
+	}
+
+	.simple_value div {
+		display: table-cell;
+	}
+
+	.simple_value_title {
+		font-weight: bold;
+	}
+
+
+	.mem_dump {
+		display: table-row;
+	}
+
+	.mem_dump div {
+		display: table-cell;
+	}
+

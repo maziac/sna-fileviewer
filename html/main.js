@@ -144,8 +144,48 @@ function htmlWord(title) {
  * @param event The event. event.target contains the object that was clicked.
  */
 function htmlMemDump(event) {
+	// Get node and attributes
 	const node = event.target;
-	node.innerHTML += "<div>done</div>";
+	const indexString = node.getAttribute('sna-index');
+	const sizeString = node.getAttribute('sna-size');
+	const offsetString = node.getAttribute('sna-offset');
+	index = parseInt(indexString);
+	const size = parseInt(sizeString);
+	const offset = parseInt(offsetString);
+
+	// TODO: Change to objects (instead of html)
+	// TODO: Add "intelligent" lines. I.e. summarize areas with same values.
+
+	// Loop given size
+	let html = ''; // '<div>';
+	let prevClose = '';
+	for (let i = 0; i < size; i++) {
+		const k = i % 16;
+		// Get value
+		const val = snaData[index++];
+		// Convert
+		const valString = getHexString(val, 2);
+		const valIntString = val.toString();
+		const hoverText = 'Index (Hex): ' + getHexString(i, 4)
+			+ '\nIndex (Dec): ' + i.toString() + '\nValue (Dec): ' + valIntString;
+
+		// Create html
+		if (k == 0) {
+			// Start of row (div + indentation)
+			const addrString = getHexString(offset + i, 4);
+			html += `
+${prevClose}
+<div class='mem_dump'>
+<div>&nbsp;</div>
+<div><b>${addrString}:</b></div>
+`;
+			prevClose = '</div>';
+		}
+		html += `<div title="${hoverText}">${valString}&nbsp;</div>`;
+	}
+
+	// Append
+	node.innerHTML += html;
 
 	// do this only once, remove listener
 	node.removeEventListener("toggle", htmlMemDump);
@@ -157,64 +197,29 @@ function htmlMemDump(event) {
  * The memory dump is collapsible.
  * @param title The title for the memory dump
  * @param size The size of the mem dump.
+ * @param offset If given this will be added in the first row.
  * @returns The html describing title and the mem dump.
  */
-function htmlMemDumpSummary(title, size) {
+function htmlMemDumpSummary(title, size, offset) {
 	// Create new node
 	const node = document.createElement("DIV");
 	const detailsNode = document.createElement("DETAILS");
 	detailsNode.setAttribute('sna-index', index.toString());
 	detailsNode.setAttribute('sna-size', size.toString());
-	detailsNode.innerHTML = "<summary>" + title + "</summary>";
+	if (offset == undefined)
+		offset = 0;
+	detailsNode.setAttribute('sna-offset', offset.toString());
+	detailsNode.innerHTML = "<summary><b>" + title + "</b></summary>";
 	node.appendChild(detailsNode);
+
+	// Increase index
+	index += size;
 
 	// Append it
 	parseNode.appendChild(node);
 
 	// Install listener
 	detailsNode.addEventListener("toggle", htmlMemDump);
-}
-
-
-function pppp() {
-
-
-	let html = `
-<div>
-<details sna-index="${index}" sna-size="${size}">
-	<summary>${title}</summary>
-`;
-
-	html += '</details></div>';
-	return html;
-
-	// Loop given size
-	let prevClose = '';
-	for (let i = 0; i < size; i++) {
-		const k = i % 16;
-		// Get value
-		const val = snaData[index++];
-		// Convert
-		const valString = getHexByteString(val);
-		const valIntString = val.toString();
-		const hoverText = 'Index (Hex): ' + getHexWordString(i)
-			+ '\nIndex (Dec): ' + i.toString() + '\nValue (Dec): ' + valIntString;
-
-		// Create html
-		if (k == 0) {
-			// Start of row (div + indentation)
-			html += `
-${prevClose}
-<div class='mem_dump'>
-<div>&nbsp;</div>
-`;
-			prevClose = '</div>';
-		}
-		html += `<div title="${hoverText}">${valString}&nbsp;</div>`;
-	}
-	// Close
-	html += '</details></div>';
-	return html;
 }
 
 
@@ -293,9 +298,9 @@ function parseRoot() {
 	// Memory banks
 	if (zx128k) {
 		// ZX128K
-		html += htmlMemDumpSummary("Bank5: 4000-7FFF", 0x4000);
-		html += htmlMemDumpSummary("Bank2: 8000-BFFF", 0x4000);
-		html += htmlMemDumpSummary("Bank" + pagedInBank.toString() + ": C000-FFFF", 0x4000);
+		html += htmlMemDumpSummary("Bank5: 4000-7FFF", 0x4000, 0x4000);
+		html += htmlMemDumpSummary("Bank2: 8000-BFFF", 0x4000, 0x8000);
+		html += htmlMemDumpSummary("Bank" + pagedInBank.toString() + ": C000-FFFF", 0x4000, 0xC000);
 		// Remaining banks
 		for (let i = 2; i < 8; i++) {
 			const p = getMemBankPermutation(i);
