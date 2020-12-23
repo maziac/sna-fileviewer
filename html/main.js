@@ -124,6 +124,54 @@ function htmlWord(title) {
 }
 
 
+
+/**
+ * Creates html output for a memory dump.
+ * The memory dump is collapsible.
+ * @param title The title for the memory dump
+ * @param size The size of the mem dump.
+ * @returns The html describing title and the mem dump.
+ */
+function htmlMemDump(title, size) {
+	let html = `
+<div>
+<details sna-index="${index}" sna-size="${size}">
+	<summary>${title}</summary>
+`;
+
+	html += '</details></div>';
+	return html;
+
+	// Loop given size
+	let prevClose = '';
+	for (let i = 0; i < size; i++) {
+		const k = i % 16;
+		// Get value
+		const val = snaData[index++];
+		// Convert
+		const valString = getHexByteString(val);
+		const valIntString = val.toString();
+		const hoverText = 'Index (Hex): ' + getHexWordString(i)
+			+ '\nIndex (Dec): ' + i.toString() + '\nValue (Dec): ' + valIntString;
+
+		// Create html
+		if (k == 0) {
+			// Start of row (div + indentation)
+			html += `
+${prevClose}
+<div class='mem_dump'>
+<div>&nbsp;</div>
+`;
+			prevClose = '</div>';
+		}
+		html += `<div title="${hoverText}">${valString}&nbsp;</div>`;
+	}
+	// Close
+	html += '</details></div>';
+	return html;
+}
+
+
 //---- Parse the data (root level) --------
 function parseRoot() {
 	index = 0;
@@ -153,12 +201,13 @@ function parseRoot() {
 	html += '</b></div>';
 
 	// Print banks
+	let pagedInBank;
 	if (zx128k) {
 		// Used banks
 		html += '<div>Banks: 5, 2, ';
 		// Get used bank
 		const port7FFD = snaData[49181];
-		const pagedInBank = port7FFD & 0x03;
+		pagedInBank = port7FFD & 0x03;
 		html += pagedInBank.toString();
 		// Remaining banks
 		for (let i = 2; i < 8; i++) {
@@ -194,6 +243,28 @@ function parseRoot() {
 	html += htmlByte("IM");
 	html += htmlWord("HL'");
 
+	// Memory banks
+	if (zx128k) {
+		// ZX128K
+		html += htmlMemDump("Bank5: 4000-7FFF", 0x4000);
+		html += htmlMemDump("Bank2: 8000-BFFF", 0x4000);
+		html += htmlMemDump("Bank" + pagedInBank.toString() + ": C000-FFFF", 0x4000);
+		// Remaining banks
+		for (let i = 2; i < 8; i++) {
+			const p = getMemBankPermutation(i);
+			if (p == pagedInBank)
+				continue;	// skip already read bank
+			html += htmlMemDump("Bank" + p.toString() + ":", 0x4000);
+		}
+	}
+	else {
+		// ZX48K
+		html += htmlMemDump("4000-7FFF", 0x4000);
+		html += htmlMemDump("8000-BFFF", 0x4000);
+		html += htmlMemDump(" C000-FFFF", 0x4000);
+	}
+
+	// Assign
 	divRoot.innerHTML = html;
 }
 
@@ -213,7 +284,3 @@ window.addEventListener('message', event => {
 			} break;
 	}
 });
-
-
-
-//parseRoot();
