@@ -135,7 +135,15 @@ export class SnaView {
 		mainHtml = mainHtml.replace('${vscodeResPath}', vscodeResPath);
 		//mainHtml = mainHtml.replace('//${script}', mainJs);
 
-		this.vscodePanel.webview.html = mainHtml;;
+		this.vscodePanel.webview.html = mainHtml;
+
+		// Set data
+		const message = {
+			command: 'setData',
+			snaData: [...data]
+		};
+		const d2 = [1, 2, 3];
+		this.vscodePanel.webview.postMessage(message);
 	}
 
 

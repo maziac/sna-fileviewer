@@ -2,7 +2,7 @@ const vscode = acquireVsCodeApi();
 
 // Initialize variables
 var index;
-var data;
+var snaData;
 
 
 //---- Handle Mouse Over, Calculation of hover text -------
@@ -81,11 +81,11 @@ function htmlTitleValue(title, value, size, hoverString) {
  * @param size The number of bytes to read.
  */
 function readData(size) {
-	let value = data[index++];
+	let value = snaData[index++];
 	let factor = 1;
 	for (let i = 1; i < size; i++) {
 		factor *= 256;
-		value += factor * data[index++];
+		value += factor * snaData[index++];
 	}
 	return value;
 }
@@ -114,13 +114,9 @@ function htmlWord(title) {
 
 //---- Parse the data (root level) --------
 function parseRoot() {
-	//let root = document.documentElement;
-	//	root.innerHTML = '<div>TEXT2</div>';
+	index = 0;
 	let divRoot = document.getElementById("div_root");
 	divRoot.innerHTML = '<div>TEXT UNDEF</div>';
-	//var textnode = document.createTextNode("Water");
-	//root.appendChild(textnode);
-
 
 	let html = '<div>TEXT DEFED</div>';
 
@@ -156,8 +152,7 @@ window.addEventListener('message', event => {
 		case 'setData':
 			{
 				// Store in global variable
-				data = message.data;
-				index = 0;
+				snaData = message.snaData;
 				// Parse
 				parseRoot();
 			} break;
@@ -165,7 +160,5 @@ window.addEventListener('message', event => {
 });
 
 
-data = [10, 110, 200, 24, 55]; //new ArrayBuffer(100);
-index = 0;
 
-parseRoot();
+//parseRoot();

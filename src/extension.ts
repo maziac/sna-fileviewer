@@ -13,6 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register command once.
     vscode.commands.registerCommand('sna-fileviewer.openSna', uri => {
+        //new SnaView("/Volumes/SDDPCIE2TB/Projects/Z80/asm/z80-sample-program/z80-sample-program.sna");
         const filePath = uri.fsPath;
         if(filePath)
             new SnaView(filePath);

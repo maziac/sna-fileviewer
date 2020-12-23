@@ -30,7 +30,7 @@
     "activationEvents": [
         "onCommand:sna-fileviewer.openSna"
     ],
-    "main": "./out/src/extension",
+    "main": "./out/extension",
     "contributes": {
         "commands": [
             {
