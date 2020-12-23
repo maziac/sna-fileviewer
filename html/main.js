@@ -50,16 +50,17 @@ function getHexString(value, size) {
  * @returns The html describing title and value.
  */
 function htmlTitleValue(title, value, size, hoverString) {
+	const digitSize = 2 * size;
 	let valString;
 	let valIntString;
 	let titleString = '';
 	if (value == undefined) {
-		valString = ''.padStart(size, '?');
+		valString = ''.padStart(digitSize, '?');
 		valIntString = '?';
 	}
 	else {
 		valIntString = value.toString() + 'd';
-		valString = getHexString(value, size);
+		valString = getHexString(value, digitSize);
 	}
 	if (hoverString == undefined)
 		hoverString = '';
@@ -97,7 +98,7 @@ function readData(size) {
  */
 function htmlByte(title) {
 	const value = readData(1);
-	return htmlTitleValue(title, value, 2);
+	return htmlTitleValue(title, value, 1);
 }
 
 /**
@@ -107,7 +108,7 @@ function htmlByte(title) {
  */
 function htmlWord(title) {
 	const value = readData(2);
-	return htmlTitleValue(title, value, 4);
+	return htmlTitleValue(title, value, 2);
 }
 
 
@@ -125,7 +126,22 @@ function parseRoot() {
 
 	// Get registers
 	html += htmlByte("I");
-
+	html += htmlWord("HL'");
+	html += htmlWord("DE'");
+	html += htmlWord("BC'");
+	html += htmlWord("AF'");
+	html += htmlWord("HL");
+	html += htmlWord("DE");
+	html += htmlWord("BC");
+	html += htmlWord("IY");
+	html += htmlWord("IX");
+	html += htmlWord("IFF2");
+	html += htmlByte("R");
+	html += htmlWord("AF");
+	const sp = readData(2);
+	html += htmlTitleValue("SP", sp, 2);
+	html += htmlByte("IM");
+	html += htmlWord("HL'");
 
 	divRoot.innerHTML = html;
 }
