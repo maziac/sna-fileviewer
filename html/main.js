@@ -1,8 +1,15 @@
 const vscode = acquireVsCodeApi();
 
 // Initialize variables
+
+// Index into snaData
 var index;
+
+// The data to parse.
 var snaData;
+
+// The root node for parsing. new objects are appended here.
+var parseNode;
 
 
 //---- Handle Mouse Over, Calculation of hover text -------
@@ -77,14 +84,19 @@ function htmlTitleValue(title, value, size, hoverString) {
 	if (hoverString == undefined)
 		hoverString = '';
 	titleString = title + ': ' + valIntString;
+
+	// Create new node
+	const node = document.createElement("DIV");
+	node.classList.add("simple_value");
 	const html = `
-<div class="simple_value">
 <div class="simple_value_title" title="${hoverString}">${title}:</div>
 <div>&nbsp;</div>
 <div title="${titleString}">${valString}</div>
-</div>
 `;
-	return html;
+	node.innerHTML = html;
+
+	// Append it
+	parseNode.appendChild(node);
 }
 
 
@@ -222,9 +234,10 @@ function parseRoot() {
 
 	// End meta info
 	html += '<hr>';
-
+	divRoot.innerHTML = html;
 
 	// Get registers
+	parseNode = divRoot;
 	html += htmlByte("I");
 	html += htmlWord("HL'");
 	html += htmlWord("DE'");
@@ -263,9 +276,6 @@ function parseRoot() {
 		html += htmlMemDump("8000-BFFF", 0x4000);
 		html += htmlMemDump(" C000-FFFF", 0x4000);
 	}
-
-	// Assign
-	divRoot.innerHTML = html;
 }
 
 
