@@ -92,7 +92,7 @@ export class SnaView {
 		html += this.htmlMemDump("Bank2: 8000-BFFF", 0x4000);
 		html += this.htmlMemDump("Bank?: C000-FFFF", 0x4000);
 
-
+/*
 		// Check for 128k
 		if (this.data.length <= SNA_HEADER_LENGTH) {
 			// ZX 48k, get PC from SP
@@ -122,43 +122,18 @@ export class SnaView {
 			}
 		}
 
-
+*/
 		// Add the html styles etc.
-		const mainHtml=`
-<!DOCTYPE HTML>
-<html>
-<head>
-	<meta charset="utf-8" >
-</head>
-
-<style>
-.simple_value {
-	display: table-row;
-}
-.simple_value div {
-	display: table-cell;
-}
-.simple_value_title {
-  font-weight: bold;
-}
-
-
-.mem_dump {
-	display: table-row;
-}
-.mem_dump div {
-	display: table-cell;
-}
-
-</style>
-
-<body>
-
-${html}
-
-</body>
-</html>
-`;
+		const extPath = vscode.extensions.getExtension("maziac.sna-fileviewer")!.extensionPath as string;
+		const mainHtmlFile = path.join(extPath, 'html/main.html');
+		let mainHtml = readFileSync(mainHtmlFile).toString();
+		const mainJsFile = path.join(extPath, 'html/main.js');
+		let mainJs = readFileSync(mainJsFile).toString();
+		// Exchange local path
+		const resourcePath = vscode.Uri.file(path.join(extPath, 'html'));
+		const vscodeResPath = this.vscodePanel.webview.asWebviewUri(resourcePath).toString();
+		mainHtml = mainHtml.replace('${vscodeResPath}', vscodeResPath);
+		//mainHtml = mainHtml.replace('//${script}', mainJs);
 
 		this.vscodePanel.webview.html = mainHtml;;
 	}
