@@ -153,39 +153,93 @@ function htmlMemDump(event) {
 	const size = parseInt(sizeString);
 	const offset = parseInt(offsetString);
 
-	// TODO: Change to objects (instead of html)
 	// TODO: Add "intelligent" lines. I.e. summarize areas with same values.
 
-	// Loop given size
-	let html = ''; // '<div>';
-	let prevClose = '';
-	for (let i = 0; i < size; i++) {
-		const k = i % 16;
-		// Get value
-		const val = snaData[index++];
-		// Convert
-		const valString = getHexString(val, 2);
-		const valIntString = val.toString();
-		const hoverText = 'Index (Hex): ' + getHexString(i, 4)
-			+ '\nIndex (Dec): ' + i.toString() + '\nValue (Dec): ' + valIntString;
+	if (true) {
+		// Loop given size
+		let html = ''; // '<div>';
+		let prevClose = '';
+		for (let i = 0; i < size; i++) {
+			const k = i % 16;
+			// Get value
+			const iOffset = offset + i;
+			const val = snaData[iOffset];
+			const valString = getHexString(val, 2);
+			const valIntString = val.toString();
 
-		// Create html
-		if (k == 0) {
-			// Start of row (div + indentation)
-			const addrString = getHexString(offset + i, 4);
-			html += `
-${prevClose}
-<div class='mem_dump'>
-<div>&nbsp;</div>
-<div><b>${addrString}:</b></div>
-`;
-			prevClose = '</div>';
+			// Start of row?
+			if (k == 0) {
+				// Close previous
+				html += prevClose;
+				prevClose = '</div>';
+				// Calc address
+				let addrString = getHexString(iOffset, 4);
+
+				// Check for same values
+				let l = i + 1
+				for (; l < size; l++) {
+					if (val != snaData[offset + l])
+						break;
+				}
+				const l16 = l - (l % 16);
+				if (l16 > i+16) {
+					// At least 2 complete rows contains same values
+					i = l16 - 1;
+					const toAddrString = getHexString(offset + i, 4);
+					const hoverText = 'Index (Dec): ' + iOffset+'-'+(offset+i)+'\nValue (Dec): ' + valIntString;
+					//html += '<div class="mem_dump_same"> <div>&nbsp;</div> <div><b>' + addrString + '-' + toAddrString + ' contain all ' + valString + '</b></div>';
+					html += '<div title="' + hoverText +'">&nbsp;<b>' + addrString + '-' + toAddrString + ' contain all ' + valString + '</b></div>';
+					continue;
+				}
+
+				// Afterwards proceed normal
+				html += '<div class="mem_dump"> <div>&nbsp;</div> <div><b>' + addrString + ':</b></div>';
+			}
+
+			// Convert to html
+			const hoverText = 'Index (Hex): ' + getHexString(iOffset, 4) + '\nIndex (Dec): ' + iOffset + '\nValue (Dec): ' + valIntString;
+			html += '<div title="'+hoverText+'">'+valString+'&nbsp;</div>';
 		}
-		html += `<div title="${hoverText}">${valString}&nbsp;</div>`;
-	}
+		// Close
+		html += prevClose;
 
-	// Append
-	node.innerHTML += html;
+		// Append
+		node.innerHTML += html;
+	}
+	else {
+		// Interestingly this is slower!!!
+		// Loop given size
+		let html = ''; // '<div>';
+		let prevClose = '';
+		let rowNode;
+		for (let i = 0; i < size; i++) {
+			const k = i % 16;
+			// Get value
+			const val = snaData[index++];
+			// Convert
+			const valString = getHexString(val, 2);
+			const valIntString = val.toString();
+			//		const hoverText = 'Index (Hex): ' + getHexString(i, 4)
+			//			+ '\nIndex (Dec): ' + i.toString() + '\nValue (Dec): ' + valIntString;
+
+			// Create html
+			if (k == 0) {
+				// Create node
+				rowNode = document.createElement("DIV");
+				rowNode.classList.add("mem_dump");
+				node.appendChild(rowNode);
+				// Address
+				const addrNode = document.createElement("DIV");
+				const addrString = getHexString(offset + i, 4);
+				addrNode.textContent = addrString;
+				rowNode.appendChild(addrNode);
+			}
+			// Value
+			const valueNode = document.createElement("DIV");
+			valueNode.textContent = valString;
+			rowNode.appendChild(valueNode);
+		}
+	}
 
 	// do this only once, remove listener
 	node.removeEventListener("toggle", htmlMemDump);

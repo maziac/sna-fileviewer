@@ -1,22 +1,33 @@
+* {
+	font-family: monospace;
+}
 
-	.simple_value {
-		display: table-row;
-	}
+.simple_value {
+	display: table-row;
+}
 
-	.simple_value div {
-		display: table-cell;
-	}
+.simple_value div {
+	display: table-cell;
+}
 
-	.simple_value_title {
-		font-weight: bold;
-	}
+.simple_value_title {
+	font-weight: bold;
+}
 
 
-	.mem_dump {
-		display: table-row;
-	}
+.mem_dump {
+	display: table-row;
+}
 
-	.mem_dump div {
-		display: table-cell;
-	}
+.mem_dump div {
+	display: table-cell;
+}
+
+.mem_dump_same {
+	display: table-row;
+}
+
+.mem_dump_same div {
+	display: table-cell;
+}
 
