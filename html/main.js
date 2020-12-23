@@ -136,6 +136,21 @@ function htmlWord(title) {
 }
 
 
+/**
+ * Is called if the user opens the details of an item.
+ * Decodes the data.
+ * Afterwards removes the listener as it is no longer needed
+ * (the data is decoded).
+ * @param event The event. event.target contains the object that was clicked.
+ */
+function htmlMemDump(event) {
+	const node = event.target;
+	node.innerHTML += "<div>done</div>";
+
+	// do this only once, remove listener
+	node.removeEventListener("toggle", htmlMemDump);
+}
+
 
 /**
  * Creates html output for a memory dump.
@@ -144,7 +159,26 @@ function htmlWord(title) {
  * @param size The size of the mem dump.
  * @returns The html describing title and the mem dump.
  */
-function htmlMemDump(title, size) {
+function htmlMemDumpSummary(title, size) {
+	// Create new node
+	const node = document.createElement("DIV");
+	const detailsNode = document.createElement("DETAILS");
+	detailsNode.setAttribute('sna-index', index.toString());
+	detailsNode.setAttribute('sna-size', size.toString());
+	detailsNode.innerHTML = "<summary>" + title + "</summary>";
+	node.appendChild(detailsNode);
+
+	// Append it
+	parseNode.appendChild(node);
+
+	// Install listener
+	detailsNode.addEventListener("toggle", htmlMemDump);
+}
+
+
+function pppp() {
+
+
 	let html = `
 <div>
 <details sna-index="${index}" sna-size="${size}">
@@ -259,22 +293,22 @@ function parseRoot() {
 	// Memory banks
 	if (zx128k) {
 		// ZX128K
-		html += htmlMemDump("Bank5: 4000-7FFF", 0x4000);
-		html += htmlMemDump("Bank2: 8000-BFFF", 0x4000);
-		html += htmlMemDump("Bank" + pagedInBank.toString() + ": C000-FFFF", 0x4000);
+		html += htmlMemDumpSummary("Bank5: 4000-7FFF", 0x4000);
+		html += htmlMemDumpSummary("Bank2: 8000-BFFF", 0x4000);
+		html += htmlMemDumpSummary("Bank" + pagedInBank.toString() + ": C000-FFFF", 0x4000);
 		// Remaining banks
 		for (let i = 2; i < 8; i++) {
 			const p = getMemBankPermutation(i);
 			if (p == pagedInBank)
 				continue;	// skip already read bank
-			html += htmlMemDump("Bank" + p.toString() + ":", 0x4000);
+			html += htmlMemDumpSummary("Bank" + p.toString() + ":", 0x4000);
 		}
 	}
 	else {
 		// ZX48K
-		html += htmlMemDump("4000-7FFF", 0x4000);
-		html += htmlMemDump("8000-BFFF", 0x4000);
-		html += htmlMemDump(" C000-FFFF", 0x4000);
+		html += htmlMemDumpSummary("4000-7FFF", 0x4000);
+		html += htmlMemDumpSummary("8000-BFFF", 0x4000);
+		html += htmlMemDumpSummary(" C000-FFFF", 0x4000);
 	}
 }
 
