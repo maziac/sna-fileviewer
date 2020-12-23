@@ -142,7 +142,6 @@ export class SnaView {
 			command: 'setData',
 			snaData: [...data]
 		};
-		const d2 = [1, 2, 3];
 		this.vscodePanel.webview.postMessage(message);
 	}
 

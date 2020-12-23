@@ -29,6 +29,18 @@ function mouseOverAddress(obj) {
 
 
 /**
+ * Returns the right bank for an index.
+ *  5,2,0,1,3,4,6,7,8,9,10,...,111.
+ * @returns the bank number 0-111.
+ */
+function getMemBankPermutation(i) {
+	if (i >= 6)
+		return i;
+	return [5, 2, 0, 1, 3, 4][i];
+}
+
+
+/**
  * Returns a hex string.
  * @param value The value to convert.
  * @param size The number of digits (e.g. 2 or 4)
@@ -116,9 +128,52 @@ function htmlWord(title) {
 function parseRoot() {
 	index = 0;
 	let divRoot = document.getElementById("div_root");
-	divRoot.innerHTML = '<div>TEXT UNDEF</div>';
+	//divRoot.innerHTML = '<div>TEXT UNDEF</div>';
 
-	let html = '<div>TEXT DEFED</div>';
+	let html = ''; //'<div>TEXT DEFED</div>';
+
+	// Check length. ZX48K or ZX128K
+	const length = snaData.length;
+	html += '<div><b>Length:</b> ' + length.toString() + '</div>';
+	html += '<div><b>';
+	let zx128k = false;
+	if (length == 49179) {
+		// ZX48K
+		html += 'ZX48K SNA file.';
+	}
+	else if (length == 131103 || length == 147487) {
+		// ZX128K
+		html += 'ZX128K SNA file.';
+		zx128k = true;
+	}
+	else {
+		// Length wrong
+		html += 'Wrong length.';
+	}
+	html += '</b></div>';
+
+	// Print banks
+	if (zx128k) {
+		// Used banks
+		html += '<div>Banks: 5, 2, ';
+		// Get used bank
+		const port7FFD = snaData[49181];
+		const pagedInBank = port7FFD & 0x03;
+		html += pagedInBank.toString();
+		// Remaining banks
+		for (let i = 2; i < 8; i++) {
+			const p = getMemBankPermutation(i);
+			if (p == pagedInBank)
+				continue;	// skip already read bank
+			html += ', ' + p.toString();
+		}
+		// End
+		html += '</div>';
+	}
+
+	// End meta info
+	html += '<hr>';
+
 
 	// Get registers
 	html += htmlByte("I");
