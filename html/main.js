@@ -153,53 +153,64 @@ function htmlMemDump(event) {
 	const size = parseInt(sizeString);
 	const offset = parseInt(offsetString);
 
-	// Loop given size
 	let html = ''; // '<div>';
 	let prevClose = '';
-	for (let i = 0; i < size; i++) {
-		const k = i % 16;
-		// Get value
-		const iOffset = offset + i;
-		const val = snaData[iOffset];
-		const valString = getHexString(val, 2);
-		const valIntString = val.toString();
 
-		// Start of row?
-		if (k == 0) {
-			// Close previous
-			html += prevClose;
-			prevClose = '</div>';
-			// Calc address
-			let addrString = getHexString(iOffset, 4);
+	// In case of an error, show at least what has been parsed so far.
+	try {
+		// Loop given size
+		for (let i = 0; i < size; i++) {
+			const k = i % 16;
+			// Get value
+			const iIndex = index + i;	// For indexing
+			const iOffset = offset + i;	// For display
+			const val = snaData[iIndex];
+			const valString = getHexString(val, 2);
+			const valIntString = val.toString();
 
-			// Check for same values
-			let l = i + 1
-			for (; l < size; l++) {
-				if (val != snaData[offset + l])
-					break;
+			// Start of row?
+			if (k == 0) {
+				// Close previous
+				html += prevClose;
+				prevClose = '</div>';
+				// Calc address
+				let addrString = getHexString(iOffset, 4);
+
+				// Check for same values
+				let l = i + 1
+				for (; l < size; l++) {
+					if (val != snaData[index + l])
+						break;
+				}
+				const l16 = l - (l % 16);
+				if (l16 > i + 16) {
+					// At least 2 complete rows contains same values
+					i = l16 - 1;
+					const toAddrString = getHexString(offset + i, 4);
+					const hoverText = 'Index (Dec): ' + iOffset + '-' + (offset + i) + '\nValue (Dec): ' + valIntString;
+					html += '<div>';
+					html += '<span class="indent mem_index">' + addrString + '-' + toAddrString + ':</span>';
+					html += '<span> contain all ' + valString + '</span>';
+					continue;
+				}
+
+				// Afterwards proceed normal
+				html += '<div class="mem_dump"> <div class="indent mem_index">' + addrString + ':</div>';
 			}
-			const l16 = l - (l % 16);
-			if (l16 > i+16) {
-				// At least 2 complete rows contains same values
-				i = l16 - 1;
-				const toAddrString = getHexString(offset + i, 4);
-				const hoverText = 'Index (Dec): ' + iOffset+'-'+(offset+i)+'\nValue (Dec): ' + valIntString;
-				html += '<div>';
-				html += '<span class="indent mem_index">' + addrString + '-' + toAddrString + ':</span>';
-				html += '<span> contain all ' + valString + '</span>';
-				continue;
-			}
 
-			// Afterwards proceed normal
-			html += '<div class="mem_dump"> <div class="indent mem_index">' + addrString + ':</div>';
+			// Convert to html
+			const hoverText = 'Index (Hex): ' + getHexString(iOffset, 4) + '\nIndex (Dec): ' + iOffset + '\nValue (Dec): ' + valIntString;
+			html += '<div class="mem_dump_cell" title="' + hoverText + '">' + valString + '&nbsp;</div>';
 		}
-
-		// Convert to html
-		const hoverText = 'Index (Hex): ' + getHexString(iOffset, 4) + '\nIndex (Dec): ' + iOffset + '\nValue (Dec): ' + valIntString;
-		html += '<div class="mem_dump_cell" title="'+hoverText+'">'+valString+'&nbsp;</div>';
+		// Close
+		html += prevClose;
 	}
-	// Close
-	html += prevClose;
+	catch (e) {
+		// Close
+		html += prevClose;
+		// Error while parsing
+		html += '<div class="error indent">Error while parsing.</div>';
+	}
 
 		// Append
 	node.innerHTML += html;
@@ -346,20 +357,20 @@ function parseRoot() {
 	htmlWord("BC");
 	htmlWord("IY");
 	htmlWord("IX");
-	htmlWord("IFF2");
+	htmlByte("Interrupt");
 	htmlByte("R");
 	htmlWord("AF");
 	const sp = readData(2);
 	htmlTitleValue("SP", sp, 2);
 	htmlByte("IM");
-	htmlWord("HL'");
+	htmlByte("Border");
 
 	// Print PC if ZX48K
 	if (!zx128k) {
 		if (sp >= 0x4000) {
 			const snaHeaderLength = 27;
 			const pcIndex = snaHeaderLength + sp - 0x4000;
-			const pc = snaData[pcIndex];
+			const pc = snaData[pcIndex] + 256 * snaData[pcIndex + 1];
 			htmlTitleValue("PC", pc, 2);
 		}
 	}
@@ -380,9 +391,9 @@ function parseRoot() {
 	}
 	else {
 		// ZX48K
-		htmlMemDumpSummary("4000-7FFF", 0x4000);
-		htmlMemDumpSummary("8000-BFFF", 0x4000);
-		htmlMemDumpSummary(" C000-FFFF", 0x4000);
+		htmlMemDumpSummary("4000-7FFF", 0x4000, 0x4000);
+		htmlMemDumpSummary("8000-BFFF", 0x4000, 0x8000);
+		htmlMemDumpSummary("C000-FFFF", 0x4000, 0xC000);
 	}
 }
 
