@@ -184,8 +184,6 @@ function htmlMemDump(event) {
 				i = l16 - 1;
 				const toAddrString = getHexString(offset + i, 4);
 				const hoverText = 'Index (Dec): ' + iOffset+'-'+(offset+i)+'\nValue (Dec): ' + valIntString;
-				//html += '<div class="mem_dump_same"> <div class="mem_cell_same">' + addrString + '-' + toAddrString + ' contain all ' + valString + '</div></div>';
-				//html += '<div class="indent mem_index" title="' + hoverText +'">' + addrString + '-' + toAddrString + ' contain all ' + valString + '</div>';
 				html += '<div>';
 				html += '<span class="indent mem_index">' + addrString + '-' + toAddrString + ':</span>';
 				html += '<span> contain all ' + valString + '</span>';
@@ -286,7 +284,7 @@ function parseRoot() {
 
 	// Check length. ZX48K or ZX128K
 	const length = snaData.length;
-	html += '<div><b>Length:</b> ' + length.toString() + '</div>';
+	html += '<div><b>Length:</b> ' + length + '</div>';
 	html += '<div><b>';
 	let zx128k = false;
 	if (length == 49179) {
@@ -300,7 +298,7 @@ function parseRoot() {
 	}
 	else {
 		// Length wrong
-		html += 'Wrong length.';
+		html += '<span class="error">Wrong length.</span>';
 	}
 	html += '</b></div>';
 
@@ -333,9 +331,7 @@ function parseRoot() {
 	// TODO: Index bei jedem htmlByte/Word Wert in Hover eintragen
 	// TODO: Schauen wie das beim Bin viewer ist: Wird Text Editor durch den View ersetzt?
 	// TODO:     "Do you want to open it anyway?" müsste mir SNA file viewer anbieten. Tut es aber nicht. ("Open with...")
-	// TODO: Font beim bin viewer ist besser. Auch könnte ich grau besser einsetzen.
 	// TODO: bin viewer öffnet Files auch direkt.
-	// TODO: Wenn file size wrong, dann rot.
 	// TODO: 0x4000 memdump: Stattdessen Bild ausgeben (oder beides)
 
 	// Get registers

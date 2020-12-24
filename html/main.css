@@ -34,3 +34,9 @@
 	padding-left: 0.25em;
 }
 
+.error {
+	color: red;
+	font-weight: bold;
+}
+
+
