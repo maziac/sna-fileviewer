@@ -1,5 +1,15 @@
 * {
-	font-family: monospace;
+    font-family: var(--vscode-editor-font-family);
+    font-weight: var(--vscode-editor-font-weight);
+    font-size: var(--vscode-editor-font-size);
+}
+
+.indent {
+	padding-left: 1em;
+}
+
+.mem_index {
+    color: var(--vscode-editorLineNumber-foreground);
 }
 
 .simple_value {
@@ -19,15 +29,8 @@
 	display: table-row;
 }
 
-.mem_dump div {
+.mem_dump_cell {
 	display: table-cell;
-}
-
-.mem_dump_same {
-	display: table-row;
-}
-
-.mem_dump_same div {
-	display: table-cell;
+	padding-left: 0.25em;
 }
 

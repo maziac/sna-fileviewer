@@ -184,18 +184,21 @@ function htmlMemDump(event) {
 				i = l16 - 1;
 				const toAddrString = getHexString(offset + i, 4);
 				const hoverText = 'Index (Dec): ' + iOffset+'-'+(offset+i)+'\nValue (Dec): ' + valIntString;
-				//html += '<div class="mem_dump_same"> <div>&nbsp;</div> <div><b>' + addrString + '-' + toAddrString + ' contain all ' + valString + '</b></div>';
-				html += '<div title="' + hoverText +'">&nbsp;<b>' + addrString + '-' + toAddrString + ' contain all ' + valString + '</b></div>';
+				//html += '<div class="mem_dump_same"> <div class="mem_cell_same">' + addrString + '-' + toAddrString + ' contain all ' + valString + '</div></div>';
+				//html += '<div class="indent mem_index" title="' + hoverText +'">' + addrString + '-' + toAddrString + ' contain all ' + valString + '</div>';
+				html += '<div>';
+				html += '<span class="indent mem_index">' + addrString + '-' + toAddrString + ':</span>';
+				html += '<span> contain all ' + valString + '</span>';
 				continue;
 			}
 
 			// Afterwards proceed normal
-			html += '<div class="mem_dump"> <div>&nbsp;</div> <div><b>' + addrString + ':</b></div>';
+			html += '<div class="mem_dump"> <div class="indent mem_index">' + addrString + ':</div>';
 		}
 
 		// Convert to html
 		const hoverText = 'Index (Hex): ' + getHexString(iOffset, 4) + '\nIndex (Dec): ' + iOffset + '\nValue (Dec): ' + valIntString;
-		html += '<div title="'+hoverText+'">'+valString+'&nbsp;</div>';
+		html += '<div class="mem_dump_cell" title="'+hoverText+'">'+valString+'&nbsp;</div>';
 	}
 	// Close
 	html += prevClose;
