@@ -12,6 +12,10 @@
     color: var(--vscode-editorLineNumber-foreground);
 }
 
+.gray {
+    color: var(--vscode-editorLineNumber-foreground);
+}
+
 .simple_value {
 	display: table-row;
 }

@@ -65,10 +65,12 @@ function getHexString(value, size) {
  * Creates html output for title and value.
  * @param title The title for the value. E.g. "SP".
  * @param value The value to show.
- * @param dataType How to convert. As HEX or INT.
- * @returns The html describing title and value.
+ * @param size 1 = byte, 2 = word.
+ * @param hoverTitleString String to show on hover for the title. Can be undefined.
+ * @param hoverValueString String to show on hover for the value. Can be undefined for default.
+ * @returns The created node.
  */
-function htmlTitleValue(title, value, size, hoverString) {
+function htmlTitleValue(title, value, size, hoverTitleString, hoverValueString) {
 	const digitSize = 2 * size;
 	let valString;
 	let valIntString;
@@ -78,25 +80,30 @@ function htmlTitleValue(title, value, size, hoverString) {
 		valIntString = '?';
 	}
 	else {
-		valIntString = value.toString() + 'd';
+		valIntString = value.toString() + ' (dec)';
 		valString = getHexString(value, digitSize);
 	}
-	if (hoverString == undefined)
-		hoverString = '';
-	titleString = title + ': ' + valIntString;
+
+	if (hoverTitleString == undefined)
+		hoverTitleString = '';
+	if (hoverValueString == undefined)
+		hoverValueString = title + ': ' + valIntString;
 
 	// Create new node
 	const node = document.createElement("DIV");
 	node.classList.add("simple_value");
 	const html = `
-<div class="simple_value_title" title="${hoverString}">${title}:</div>
+<div class="simple_value_title" title="${hoverTitleString}">${title}:</div>
 <div>&nbsp;</div>
-<div title="${titleString}">${valString}</div>
+<div title="${hoverValueString}">${valString}</div>
 `;
 	node.innerHTML = html;
 
 	// Append it
 	parseNode.appendChild(node);
+
+	// Return node
+	return node;
 }
 
 
@@ -187,7 +194,7 @@ function htmlMemDump(event) {
 					// At least 2 complete rows contains same values
 					i = l16 - 1;
 					const toAddrString = getHexString(offset + i, 4);
-					const hoverText = 'Index (Dec): ' + iOffset + '-' + (offset + i) + '\nValue (Dec): ' + valIntString;
+					const hoverText = 'Index (dec): ' + iOffset + '-' + (offset + i) + '\nValue (dec): ' + valIntString;
 					html += '<div>';
 					html += '<span class="indent mem_index">' + addrString + '-' + toAddrString + ':</span>';
 					html += '<span> contain all ' + valString + '</span>';
@@ -199,7 +206,7 @@ function htmlMemDump(event) {
 			}
 
 			// Convert to html
-			const hoverText = 'Index (Hex): ' + getHexString(iOffset, 4) + '\nIndex (Dec): ' + iOffset + '\nValue (Dec): ' + valIntString;
+			const hoverText = 'Index (hex): ' + getHexString(iOffset, 4) + '\nIndex (dec): ' + iOffset + '\nValue (dec): ' + valIntString;
 			html += '<div class="mem_dump_cell" title="' + hoverText + '">' + valString + '&nbsp;</div>';
 		}
 		// Close
@@ -228,8 +235,8 @@ function htmlMemDump(event) {
 			// Convert
 			const valString = getHexString(val, 2);
 			const valIntString = val.toString();
-			//		const hoverText = 'Index (Hex): ' + getHexString(i, 4)
-			//			+ '\nIndex (Dec): ' + i.toString() + '\nValue (Dec): ' + valIntString;
+			//		const hoverText = 'Index (hex): ' + getHexString(i, 4)
+			//			+ '\nIndex (dec): ' + i.toString() + '\nValue (dec): ' + valIntString;
 
 			// Create html
 			if (k == 0) {
@@ -360,27 +367,43 @@ function parseRoot() {
 	htmlByte("Interrupt");
 	htmlByte("R");
 	htmlWord("AF");
+
 	const sp = readData(2);
 	htmlTitleValue("SP", sp, 2);
-	htmlByte("IM");
-	htmlByte("Border");
-
 	// Print PC if ZX48K
 	if (!zx128k) {
+		const hoverPcText = 'PC is derived from the location SP points to.';
+		let pcNode;
 		if (sp >= 0x4000) {
 			const snaHeaderLength = 27;
 			const pcIndex = snaHeaderLength + sp - 0x4000;
 			const pc = snaData[pcIndex] + 256 * snaData[pcIndex + 1];
-			htmlTitleValue("PC", pc, 2);
+			pcNode = htmlTitleValue("PC", pc, 2, hoverPcText);
 		}
+		else {
+			pcNode = htmlTitleValue("PC", undefined, 2, hoverPcText, "SP points to ROM. Can't decode PC.");
+		}
+		// Indent
+		const keyNode = pcNode.firstElementChild;
+		keyNode.classList.add("indent");
+		pcNode.classList.add("gray");
 	}
 
-	// Memory banks
+	htmlByte("IM");
+	htmlByte("Border");
+
+
+	// Split for different formats
 	if (zx128k) {
 		// ZX128K
+		// Memdumps
 		htmlMemDumpSummary("Bank5: 4000-7FFF", 0x4000, 0x4000);
 		htmlMemDumpSummary("Bank2: 8000-BFFF", 0x4000, 0x8000);
 		htmlMemDumpSummary("Bank" + pagedInBank.toString() + ": C000-FFFF", 0x4000, 0xC000);
+		// A few more registers
+		htmlWord("PC");
+		htmlByte("Port 7FFD");
+		htmlByte("TRDOS ROM");
 		// Remaining banks
 		for (let i = 2; i < 8; i++) {
 			const p = getMemBankPermutation(i);
