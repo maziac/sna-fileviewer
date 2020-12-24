@@ -153,60 +153,57 @@ function htmlMemDump(event) {
 	const size = parseInt(sizeString);
 	const offset = parseInt(offsetString);
 
-	// TODO: Add "intelligent" lines. I.e. summarize areas with same values.
+	// Loop given size
+	let html = ''; // '<div>';
+	let prevClose = '';
+	for (let i = 0; i < size; i++) {
+		const k = i % 16;
+		// Get value
+		const iOffset = offset + i;
+		const val = snaData[iOffset];
+		const valString = getHexString(val, 2);
+		const valIntString = val.toString();
 
-	if (true) {
-		// Loop given size
-		let html = ''; // '<div>';
-		let prevClose = '';
-		for (let i = 0; i < size; i++) {
-			const k = i % 16;
-			// Get value
-			const iOffset = offset + i;
-			const val = snaData[iOffset];
-			const valString = getHexString(val, 2);
-			const valIntString = val.toString();
+		// Start of row?
+		if (k == 0) {
+			// Close previous
+			html += prevClose;
+			prevClose = '</div>';
+			// Calc address
+			let addrString = getHexString(iOffset, 4);
 
-			// Start of row?
-			if (k == 0) {
-				// Close previous
-				html += prevClose;
-				prevClose = '</div>';
-				// Calc address
-				let addrString = getHexString(iOffset, 4);
-
-				// Check for same values
-				let l = i + 1
-				for (; l < size; l++) {
-					if (val != snaData[offset + l])
-						break;
-				}
-				const l16 = l - (l % 16);
-				if (l16 > i+16) {
-					// At least 2 complete rows contains same values
-					i = l16 - 1;
-					const toAddrString = getHexString(offset + i, 4);
-					const hoverText = 'Index (Dec): ' + iOffset+'-'+(offset+i)+'\nValue (Dec): ' + valIntString;
-					//html += '<div class="mem_dump_same"> <div>&nbsp;</div> <div><b>' + addrString + '-' + toAddrString + ' contain all ' + valString + '</b></div>';
-					html += '<div title="' + hoverText +'">&nbsp;<b>' + addrString + '-' + toAddrString + ' contain all ' + valString + '</b></div>';
-					continue;
-				}
-
-				// Afterwards proceed normal
-				html += '<div class="mem_dump"> <div>&nbsp;</div> <div><b>' + addrString + ':</b></div>';
+			// Check for same values
+			let l = i + 1
+			for (; l < size; l++) {
+				if (val != snaData[offset + l])
+					break;
+			}
+			const l16 = l - (l % 16);
+			if (l16 > i+16) {
+				// At least 2 complete rows contains same values
+				i = l16 - 1;
+				const toAddrString = getHexString(offset + i, 4);
+				const hoverText = 'Index (Dec): ' + iOffset+'-'+(offset+i)+'\nValue (Dec): ' + valIntString;
+				//html += '<div class="mem_dump_same"> <div>&nbsp;</div> <div><b>' + addrString + '-' + toAddrString + ' contain all ' + valString + '</b></div>';
+				html += '<div title="' + hoverText +'">&nbsp;<b>' + addrString + '-' + toAddrString + ' contain all ' + valString + '</b></div>';
+				continue;
 			}
 
-			// Convert to html
-			const hoverText = 'Index (Hex): ' + getHexString(iOffset, 4) + '\nIndex (Dec): ' + iOffset + '\nValue (Dec): ' + valIntString;
-			html += '<div title="'+hoverText+'">'+valString+'&nbsp;</div>';
+			// Afterwards proceed normal
+			html += '<div class="mem_dump"> <div>&nbsp;</div> <div><b>' + addrString + ':</b></div>';
 		}
-		// Close
-		html += prevClose;
+
+		// Convert to html
+		const hoverText = 'Index (Hex): ' + getHexString(iOffset, 4) + '\nIndex (Dec): ' + iOffset + '\nValue (Dec): ' + valIntString;
+		html += '<div title="'+hoverText+'">'+valString+'&nbsp;</div>';
+	}
+	// Close
+	html += prevClose;
 
 		// Append
-		node.innerHTML += html;
-	}
-	else {
+	node.innerHTML += html;
+
+	/*
 		// Interestingly this is slower!!!
 		// Loop given size
 		let html = ''; // '<div>';
@@ -240,6 +237,7 @@ function htmlMemDump(event) {
 			rowNode.appendChild(valueNode);
 		}
 	}
+	*/
 
 	// do this only once, remove listener
 	node.removeEventListener("toggle", htmlMemDump);
@@ -281,9 +279,7 @@ function htmlMemDumpSummary(title, size, offset) {
 function parseRoot() {
 	index = 0;
 	let divRoot = document.getElementById("div_root");
-	//divRoot.innerHTML = '<div>TEXT UNDEF</div>';
-
-	let html = ''; //'<div>TEXT DEFED</div>';
+	let html = '';
 
 	// Check length. ZX48K or ZX128K
 	const length = snaData.length;
@@ -328,46 +324,66 @@ function parseRoot() {
 	// End meta info
 	html += '<hr>';
 	divRoot.innerHTML = html;
+	// From here on the main DOM tree is manipulated via objects.
+
+	// TODO: PC ausgeben
+	// TODO: Index bei jedem htmlByte/Word Wert in Hover eintragen
+	// TODO: Schauen wie das beim Bin viewer ist: Wird Text Editor durch den View ersetzt?
+	// TODO:     "Do you want to open it anyway?" müsste mir SNA file viewer anbieten. Tut es aber nicht. ("Open with...")
+	// TODO: Font beim bin viewer ist besser. Auch könnte ich grau besser einsetzen.
+	// TODO: bin viewer öffnet Files auch direkt.
+	// TODO: Wenn file size wrong, dann rot.
+	// TODO: 0x4000 memdump: Stattdessen Bild ausgeben (oder beides)
 
 	// Get registers
 	parseNode = divRoot;
-	html += htmlByte("I");
-	html += htmlWord("HL'");
-	html += htmlWord("DE'");
-	html += htmlWord("BC'");
-	html += htmlWord("AF'");
-	html += htmlWord("HL");
-	html += htmlWord("DE");
-	html += htmlWord("BC");
-	html += htmlWord("IY");
-	html += htmlWord("IX");
-	html += htmlWord("IFF2");
-	html += htmlByte("R");
-	html += htmlWord("AF");
+	htmlByte("I");
+	htmlWord("HL'");
+	htmlWord("DE'");
+	htmlWord("BC'");
+	htmlWord("AF'");
+	htmlWord("HL");
+	htmlWord("DE");
+	htmlWord("BC");
+	htmlWord("IY");
+	htmlWord("IX");
+	htmlWord("IFF2");
+	htmlByte("R");
+	htmlWord("AF");
 	const sp = readData(2);
-	html += htmlTitleValue("SP", sp, 2);
-	html += htmlByte("IM");
-	html += htmlWord("HL'");
+	htmlTitleValue("SP", sp, 2);
+	htmlByte("IM");
+	htmlWord("HL'");
+
+	// Print PC if ZX48K
+	if (!zx128k) {
+		if (sp >= 0x4000) {
+			const snaHeaderLength = 27;
+			const pcIndex = snaHeaderLength + sp - 0x4000;
+			const pc = snaData[pcIndex];
+			htmlTitleValue("PC", pc, 2);
+		}
+	}
 
 	// Memory banks
 	if (zx128k) {
 		// ZX128K
-		html += htmlMemDumpSummary("Bank5: 4000-7FFF", 0x4000, 0x4000);
-		html += htmlMemDumpSummary("Bank2: 8000-BFFF", 0x4000, 0x8000);
-		html += htmlMemDumpSummary("Bank" + pagedInBank.toString() + ": C000-FFFF", 0x4000, 0xC000);
+		htmlMemDumpSummary("Bank5: 4000-7FFF", 0x4000, 0x4000);
+		htmlMemDumpSummary("Bank2: 8000-BFFF", 0x4000, 0x8000);
+		htmlMemDumpSummary("Bank" + pagedInBank.toString() + ": C000-FFFF", 0x4000, 0xC000);
 		// Remaining banks
 		for (let i = 2; i < 8; i++) {
 			const p = getMemBankPermutation(i);
 			if (p == pagedInBank)
 				continue;	// skip already read bank
-			html += htmlMemDumpSummary("Bank" + p.toString() + ":", 0x4000);
+			htmlMemDumpSummary("Bank" + p.toString() + ":", 0x4000);
 		}
 	}
 	else {
 		// ZX48K
-		html += htmlMemDumpSummary("4000-7FFF", 0x4000);
-		html += htmlMemDumpSummary("8000-BFFF", 0x4000);
-		html += htmlMemDumpSummary(" C000-FFFF", 0x4000);
+		htmlMemDumpSummary("4000-7FFF", 0x4000);
+		htmlMemDumpSummary("8000-BFFF", 0x4000);
+		htmlMemDumpSummary(" C000-FFFF", 0x4000);
 	}
 }
 
