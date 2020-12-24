@@ -11,7 +11,7 @@ var snaData;
 // The root node for parsing. new objects are appended here.
 var parseNode;
 
-
+/*
 //---- Handle Mouse Over, Calculation of hover text -------
 function mouseOverValue(obj) {
 	const address = obj.getAttribute("address");
@@ -30,7 +30,7 @@ function mouseOverAddress(obj) {
 		address: address
 	});
 }
-
+*/
 
 //---- Parse functions. --------
 
@@ -84,8 +84,11 @@ function htmlTitleValue(title, value, size, hoverTitleString, hoverValueString) 
 		valString = getHexString(value, digitSize);
 	}
 
-	if (hoverTitleString == undefined)
-		hoverTitleString = '';
+	if (hoverTitleString == undefined) {
+		// Add index as hover string
+		const previndex = index - size;
+		hoverTitleString = title + '\nIndex (hex): ' + getHexString(previndex, 4) + '\nIndex (dec): ' + previndex;
+	}
 	if (hoverValueString == undefined)
 		hoverValueString = title + ': ' + valIntString;
 
@@ -345,8 +348,6 @@ function parseRoot() {
 	divRoot.innerHTML = html;
 	// From here on the main DOM tree is manipulated via objects.
 
-	// TODO: PC ausgeben
-	// TODO: Index bei jedem htmlByte/Word Wert in Hover eintragen
 	// TODO: Schauen wie das beim Bin viewer ist: Wird Text Editor durch den View ersetzt?
 	// TODO:     "Do you want to open it anyway?" müsste mir SNA file viewer anbieten. Tut es aber nicht. ("Open with...")
 	// TODO: bin viewer öffnet Files auch direkt.

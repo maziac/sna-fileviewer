@@ -1,23 +1,19 @@
 import * as vscode from 'vscode';
-import {SnaView} from './snaview';
+import {SnaEditorProvider} from './snaeditorprovider';
 
 
 export function activate(context: vscode.ExtensionContext) {
-	// Enable logging.
+    // Enable logging.
     configure(context);
 
     // Check for every change.
-	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
+    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
         configure(context, event);
     }));
 
-    // Register command once.
-    vscode.commands.registerCommand('sna-fileviewer.openSna', uri => {
-        //new SnaView("/Volumes/SDDPCIE2TB/Projects/Z80/asm/z80-sample-program/z80-sample-program.sna");
-        const filePath = uri.fsPath;
-        if(filePath)
-            new SnaView(filePath);
-    });
+    // Register custom readonly editor provider
+    const viewProvider = new SnaEditorProvider();
+    vscode.window.registerCustomEditorProvider('sna-fileviewer.viewer', viewProvider, {webviewOptions: {enableFindWidget: true}});
 }
 
 
