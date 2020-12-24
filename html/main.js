@@ -305,7 +305,6 @@ function parseRoot() {
 
 	// Check length. ZX48K or ZX128K
 	const length = snaData.length;
-	html += '<div><b>Length:</b> ' + length + '</div>';
 	html += '<div><b>';
 	let zx128k = false;
 	if (length == 49179) {
@@ -322,6 +321,7 @@ function parseRoot() {
 		html += '<span class="error">Wrong length.</span>';
 	}
 	html += '</b></div>';
+	html += '<div><b>Length:</b> ' + length + '</div>';
 
 	// Print banks
 	let pagedInBank;
@@ -344,13 +344,11 @@ function parseRoot() {
 	}
 
 	// End meta info
-	html += '<hr>';
+	//html += '<hr>';
+	html += '<br>';
 	divRoot.innerHTML = html;
 	// From here on the main DOM tree is manipulated via objects.
 
-	// TODO: Schauen wie das beim Bin viewer ist: Wird Text Editor durch den View ersetzt?
-	// TODO:     "Do you want to open it anyway?" müsste mir SNA file viewer anbieten. Tut es aber nicht. ("Open with...")
-	// TODO: bin viewer öffnet Files auch direkt.
 	// TODO: 0x4000 memdump: Stattdessen Bild ausgeben (oder beides)
 
 	// Get registers

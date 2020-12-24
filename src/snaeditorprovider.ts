@@ -32,11 +32,10 @@ export class SnaEditorProvider implements vscode.CustomReadonlyEditorProvider {
 
 		// Read the file
 		const filePath = snaDoc.uri.fsPath;
-		const title = path.basename(filePath);
 		const snaData = readFileSync(filePath);
 
 		// Create html code
-		const html = this.getHtml(webviewPanel);
+		const html = this.getMainHtml(webviewPanel);
 		webviewPanel.webview.html = html;
 
 		// Parse data
@@ -51,18 +50,17 @@ export class SnaEditorProvider implements vscode.CustomReadonlyEditorProvider {
 	/**
 	 * Sets the html code to display the text.
 	 */
-	protected getHtml(webviewPanel) {
+	protected getMainHtml(webviewPanel) {
 		// Add the html styles etc.
 		const extPath = vscode.extensions.getExtension("maziac.sna-fileviewer")!.extensionPath as string;
 		const mainHtmlFile = path.join(extPath, 'html/main.html');
 		let mainHtml = readFileSync(mainHtmlFile).toString();
-		//const mainJsFile = path.join(extPath, 'html/main.js');
-		//let mainJs = readFileSync(mainJsFile).toString();
 		// Exchange local path
 		const resourcePath = vscode.Uri.file(path.join(extPath, 'html'));
 		const vscodeResPath = webviewPanel.webview.asWebviewUri(resourcePath).toString();
 		mainHtml = mainHtml.replace('${vscodeResPath}', vscodeResPath);
-		//mainHtml = mainHtml.replace('//${script}', mainJs);
+		// Add a Reload button for debugging
+		//mainHtml = mainHtml.replace('<body>', '<body> <button onclick="parseRoot()">Reload</button>');
 
 		return mainHtml;
 	}
