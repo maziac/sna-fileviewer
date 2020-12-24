@@ -28,32 +28,23 @@
         "Programming Languages"
     ],
     "activationEvents": [
+        "onCustomEditor:sna-fileviewer.viewer",
         "onCommand:sna-fileviewer.openSna"
     ],
     "main": "./out/extension",
     "contributes": {
-        "commands": [
+        "customEditors": [
             {
-                "command": "sna-fileviewer.openSna",
-                "title": "Open in SNA File Viewer"
+                "viewType": "sna-fileviewer.viewer",
+                "displayName": "ZX SNA File Viewer",
+                "selector": [
+                    {
+                        "filenamePattern": "*.sna"
+                    }
+                ],
+                "priority": "default"
             }
-        ],
-        "menus": {
-            "editor/title": [
-                {
-                    "command": "sna-fileviewer.openSna",
-                    "group": "navigation",
-                    "when": "resourceExtname == .sna || resourceExtname == .SNA"
-                }
-            ],
-            "explorer/context": [
-                {
-                    "command": "sna-fileviewer.openSna",
-                    "group": "navigation",
-                    "when": "resourceExtname == .sna || resourceExtname == .SNA"
-                }
-            ]
-        }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
