@@ -397,9 +397,24 @@ function parseRoot() {
 	if (zx128k) {
 		// ZX128K
 		// Memdumps
-		//htmlMemDumpSummary("Bank5: 4000-7FFF", 0x4000, 0x4000);
-		//htmlMemDumpSummary("Bank2: 8000-BFFF", 0x4000, 0x8000);
-		//htmlMemDumpSummary("Bank" + pagedInBank.toString() + ": C000-FFFF", 0x4000, 0xC000);
+		htmlDetails("Bank5: 4000-7FFF", 0x4000, () => {
+			const index = snaIndex;	// Save
+			// Details as picture
+			htmlDetails("Screen", 0x4000, () => {
+				htmlUlaScreen();
+			});
+			// Details as mem dump
+			snaIndex = index;	// Restore
+			htmlDetails("Memory Dump", 0x4000, () => {
+				htmlMemDump(0x4000, 0x4000);
+			});
+		});
+		htmlDetails("Bank2: 8000-BFFF", 0x8000, () => {
+			htmlMemDump(0x4000, 0x8000);
+		});
+		htmlDetails("Bank" + pagedInBank.toString() + ": C000-FFFF", 0x4000, () => {
+			htmlMemDump(0x4000, 0xC000);
+		});
 		// A few more registers
 		htmlWord("PC");
 		htmlByte("Port 7FFD");
@@ -409,12 +424,13 @@ function parseRoot() {
 			const p = getMemBankPermutation(i);
 			if (p == pagedInBank)
 				continue;	// skip already read bank
-			//htmlMemDumpSummary("Bank" + p.toString() + ":", 0x4000);
+			htmlDetails("Bank" + p.toString() + ":", 0x4000, () => {
+				htmlMemDump(0x4000);
+			});
 		}
 	}
 	else {
 		// ZX48K
-		//htmlImgAndMemDumpSummary("4000-7FFF", 0x4000, 0x4000);
 		htmlDetails("4000-7FFF", 0x4000, () => {
 			const index = snaIndex;	// Save
 			// Details as picture
@@ -427,10 +443,12 @@ function parseRoot() {
 				htmlMemDump(0x4000, 0x4000);
 			});
 		});
-
-		//htmlMemDumpSummary("4000-7FFF", 0x4000, 0x4000);
-		//htmlMemDumpSummary("8000-BFFF", 0x4000, 0x8000);
-		//htmlMemDumpSummary("C000-FFFF", 0x4000, 0xC000);
+		htmlDetails("8000-BFFF", 0x4000, () => {
+			htmlMemDump(0x4000, 0x8000);
+		});
+		htmlDetails("C000-FFFF", 0x4000, () => {
+			htmlMemDump(0x4000, 0xC000);
+		});
 	}
 }
 
