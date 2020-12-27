@@ -194,7 +194,6 @@ function htmlMemDump(event: any) {
 	const offset = parseInt(offsetString);
 
 	// Image
-	let screenGifString = '';
 	try {
 		// Convert image
 		const ulaScreen = new UlaScreen(snaData, index);
@@ -202,7 +201,7 @@ function htmlMemDump(event: any) {
 		// Create gif
 		const base64String = arrayBufferToBase64(imgBuffer);
 		// Add to html
-		node.innerHTML += '<img width="1024" height="1024" src="data:image/gif;base64,' + base64String + '">';
+		node.innerHTML += '<img width="500px" src="data:image/gif;base64,' + base64String + '">';
 	}
 	catch {
 		node.innerHTML += '<div class="error">Error converting image.</div>';
@@ -317,20 +316,45 @@ function htmlMemDump(event: any) {
 /**
  * Creates html output for a memory dump.
  * The memory dump is collapsible.
- * @param title The title for the memory dump
+ * @param title The title for the memory dump.
  * @param size The size of the mem dump.
  * @param offset If given this will be added in the first row.
  */
 function htmlMemDumpSummary(title: string, size: number, offset?: number) {
 	// Create new node
-	const node = document.createElement("DIV");
 	const detailsNode = document.createElement("DETAILS");
 	detailsNode.setAttribute('sna-index', index.toString());
 	detailsNode.setAttribute('sna-size', size.toString());
 	if (offset == undefined)
 		offset = 0;
 	detailsNode.setAttribute('sna-offset', offset.toString());
-	detailsNode.innerHTML = "<summary><b>" + title + "</b></summary>";
+	detailsNode.innerHTML = "<summary>" + title + "</summary>";
+
+	// Increase index
+	index += size;
+
+	// Append it
+	parseNode.appendChild(detailsNode);
+
+	// Install listener
+	detailsNode.addEventListener("toggle", htmlMemDump);
+}
+
+
+/**
+ * Creates html output for a memory dump.
+ * The memory dump is collapsible.
+ * @param title The title for the memory dump.
+ * @param size The size of the mem dump.
+ * @param offset If given this will be added in the first row.
+ */
+function htmlImgAndMemDumpSummary(title: string, size: number, offset?: number) {
+	// Create new node
+	const node = document.createElement("DIV");
+	const detailsNode = document.createElement("DETAILS");
+	detailsNode.setAttribute('sna-index', index.toString());
+	detailsNode.setAttribute('sna-size', size.toString());
+	detailsNode.innerHTML = "<summary>" + title + "</summary>";
 	node.appendChild(detailsNode);
 
 	// Increase index
@@ -340,8 +364,9 @@ function htmlMemDumpSummary(title: string, size: number, offset?: number) {
 	parseNode.appendChild(node);
 
 	// Install listener
-	detailsNode.addEventListener("toggle", htmlMemDump);
+	detailsNode.addEventListener("toggle", htmlImgAndMemDump);
 }
+
 
 
 //---- Parse the data (root level) --------
@@ -394,9 +419,6 @@ function parseRoot() {
 	//html += '<hr>';
 	html += '<br>';
 	divRoot.innerHTML = html;
-	// From here on the main DOM tree is manipulated via objects.
-
-	// TODO: 0x4000 memdump: Stattdessen Bild ausgeben (oder beides)
 
 	// Get registers
 	parseNode = divRoot;
@@ -460,6 +482,7 @@ function parseRoot() {
 	}
 	else {
 		// ZX48K
+		//htmlImgAndMemDumpSummary("4000-7FFF", 0x4000, 0x4000);
 		htmlMemDumpSummary("4000-7FFF", 0x4000, 0x4000);
 		htmlMemDumpSummary("8000-BFFF", 0x4000, 0x8000);
 		htmlMemDumpSummary("C000-FFFF", 0x4000, 0xC000);
