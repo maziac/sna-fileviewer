@@ -19,11 +19,15 @@ const vscode = acquireVsCodeApi();
 
 // Initialize variables
 
-// Index into snaData
-var index: number;
 
 // The data to parse.
 var snaData: number[];
+
+// Index into snaData
+var snaIndex: number;
+
+// Current size of data slice
+var snaSize: number;
 
 // The root node for parsing. new objects are appended here.
 var parseNode: any;
@@ -116,7 +120,7 @@ function htmlTitleValue(title: string, value: number, size: number, hoverTitleSt
 
 	if (hoverTitleString == undefined) {
 		// Add index as hover string
-		const previndex = index - size;
+		const previndex = snaIndex - size;
 		hoverTitleString = title + '\nIndex (hex): ' + getHexString(previndex, 4) + '\nIndex (dec): ' + previndex;
 	}
 	if (hoverValueString == undefined)
@@ -126,7 +130,7 @@ function htmlTitleValue(title: string, value: number, size: number, hoverTitleSt
 	const node = document.createElement("DIV");
 	node.classList.add("simple_value");
 	const html = `
-<div class="simple_value_title" title="${hoverTitleString}">${title}:</div>
+<div class="simple_value_title indent" title="${hoverTitleString}">${title}:</div>
 <div>&nbsp;</div>
 <div title="${hoverValueString}">${valString}</div>
 `;
@@ -145,11 +149,11 @@ function htmlTitleValue(title: string, value: number, size: number, hoverTitleSt
  * @param size The number of bytes to read.
  */
 function readData(size: number) {
-	let value = snaData[index++];
+	let value = snaData[snaIndex++];
 	let factor = 1;
 	for (let i = 1; i < size; i++) {
 		factor *= 256;
-		value += factor * snaData[index++];
+		value += factor * snaData[snaIndex++];
 	}
 	return value;
 }
@@ -183,20 +187,20 @@ function htmlWord(title: string) {
  * (the data is decoded).
  * @param event The event. event.target contains the object that was clicked.
  */
-function htmlMemDump(event: any) {
+function htmlMemDumpx(event: any) {
 	// Get node and attributes
 	const node = event.target;
 	const indexString = node.getAttribute('sna-index');
 	const sizeString = node.getAttribute('sna-size');
 	const offsetString = node.getAttribute('sna-offset');
-	index = parseInt(indexString);
+	snaIndex = parseInt(indexString);
 	const size = parseInt(sizeString);
 	const offset = parseInt(offsetString);
 
 	// Image
 	try {
 		// Convert image
-		const ulaScreen = new UlaScreen(snaData, index);
+		const ulaScreen = new UlaScreen(snaData, snaIndex);
 		const imgBuffer = ulaScreen.getUlaScreen();
 		// Create gif
 		const base64String = arrayBufferToBase64(imgBuffer);
@@ -219,7 +223,7 @@ function htmlMemDump(event: any) {
 		for (let i = 0; i < size; i++) {
 			const k = i % 16;
 			// Get value
-			const iIndex = index + i;	// For indexing
+			const iIndex = snaIndex + i;	// For indexing
 			const iOffset = offset + i;	// For display
 			const val = snaData[iIndex];
 			const valString = getHexString(val, 2);
@@ -236,7 +240,7 @@ function htmlMemDump(event: any) {
 				// Check for same values
 				let l = i + 1
 				for (; l < size; l++) {
-					if (val != snaData[index + l])
+					if (val != snaData[snaIndex + l])
 						break;
 				}
 				const l16 = l - (l % 16);
@@ -313,6 +317,99 @@ function htmlMemDump(event: any) {
 }
 
 
+
+/**
+ * Is called if the user opens the details of an item.
+ * Decodes the data.
+ * @param size The size of the node / the data to decode.
+ * @param offset To add to the index for display.
+ */
+function htmlMemDump(size: number, offset = 0) {
+	/*
+	// Image
+	try {
+		// Convert image
+		const ulaScreen = new UlaScreen(snaData, index);
+		const imgBuffer = ulaScreen.getUlaScreen();
+		// Create gif
+		const base64String = arrayBufferToBase64(imgBuffer);
+		// Add to html
+		node.innerHTML += '<img width="500px" src="data:image/gif;base64,' + base64String + '">';
+	}
+	catch {
+		node.innerHTML += '<div class="error">Error converting image.</div>';
+	}
+*/
+
+	getParseNodeIndex();
+
+	let html = ''; // '<div>';
+	let prevClose = '';
+
+	// In case of an error, show at least what has been parsed so far.
+	try {
+		// Loop given size
+		for (let i = 0; i < size; i++) {
+			const k = i % 16;
+			// Get value
+			const iIndex = snaIndex + i;	// For indexing
+			const iOffset = offset + i;	// For display
+			const val = snaData[iIndex];
+			const valString = getHexString(val, 2);
+			const valIntString = val.toString();
+
+			// Start of row?
+			if (k == 0) {
+				// Close previous
+				html += prevClose;
+				prevClose = '</div>';
+				// Calc address
+				let addrString = getHexString(iOffset, 4);
+
+				// Check for same values
+				let l = i + 1
+				for (; l < size; l++) {
+					if (val != snaData[snaIndex + l])
+						break;
+				}
+				const l16 = l - (l % 16);
+				if (l16 > i + 16) {
+					// At least 2 complete rows contains same values
+					i = l16 - 1;
+					const toAddrString = getHexString(offset + i, 4);
+					const hoverText = 'Index (dec): ' + iOffset + '-' + (offset + i) + '\nValue (dec): ' + valIntString;
+					html += '<div>';
+					html += '<span class="indent mem_index">' + addrString + '-' + toAddrString + ':</span>';
+					html += '<span> contain all ' + valString + '</span>';
+					continue;
+				}
+
+				// Afterwards proceed normal
+				html += '<div class="mem_dump"> <div class="indent mem_index">' + addrString + ':</div>';
+			}
+
+			// Convert to html
+			const hoverText = 'Index (hex): ' + getHexString(iOffset, 4) + '\nIndex (dec): ' + iOffset + '\nValue (dec): ' + valIntString;
+			html += '<div class="mem_dump_cell" title="' + hoverText + '">' + valString + '&nbsp;</div>';
+		}
+		// Close
+		html += prevClose;
+	}
+	catch (e) {
+		// Close
+		html += prevClose;
+		// Error while parsing
+		html += '<div class="error indent">Error while parsing.</div>';
+	}
+
+	// Append
+	parseNode.innerHTML += html;
+
+	// Set as decoded
+	setParseNodeDecoded();
+}
+
+
 /**
  * Creates html output for a memory dump.
  * The memory dump is collapsible.
@@ -323,7 +420,7 @@ function htmlMemDump(event: any) {
 function htmlMemDumpSummary(title: string, size: number, offset?: number) {
 	// Create new node
 	const detailsNode = document.createElement("DETAILS");
-	detailsNode.setAttribute('sna-index', index.toString());
+	detailsNode.setAttribute('sna-index', snaIndex.toString());
 	detailsNode.setAttribute('sna-size', size.toString());
 	if (offset == undefined)
 		offset = 0;
@@ -331,13 +428,40 @@ function htmlMemDumpSummary(title: string, size: number, offset?: number) {
 	detailsNode.innerHTML = "<summary>" + title + "</summary>";
 
 	// Increase index
-	index += size;
+	snaIndex += size;
 
 	// Append it
 	parseNode.appendChild(detailsNode);
 
 	// Install listener
 	detailsNode.addEventListener("toggle", htmlMemDump);
+}
+
+
+/**
+ * Creates a collapsible summary/details node.
+ * @param title The title of the node.
+ * @param size The size of the node.
+ */
+function htmlDetails(title: string, size: number, func: (event: any) => void) {
+	// Create new node
+	const detailsNode = document.createElement("DETAILS");
+	detailsNode.innerHTML = "<summary>" + title + "</summary>";
+	// Indent
+	detailsNode.classList.add("indent");
+
+	// Set attributes
+	detailsNode.setAttribute('sna-index', snaIndex.toString());
+	//detailsNode.setAttribute('sna-size', size.toString());
+
+	// Increase index
+	snaIndex += size;
+
+	// Append it
+	parseNode.appendChild(detailsNode);
+
+	// Install listener
+	detailsNode.addEventListener("toggle", func);
 }
 
 
@@ -352,26 +476,65 @@ function htmlImgAndMemDumpSummary(title: string, size: number, offset?: number) 
 	// Create new node
 	const node = document.createElement("DIV");
 	const detailsNode = document.createElement("DETAILS");
-	detailsNode.setAttribute('sna-index', index.toString());
+	detailsNode.setAttribute('sna-index', snaIndex.toString());
 	detailsNode.setAttribute('sna-size', size.toString());
 	detailsNode.innerHTML = "<summary>" + title + "</summary>";
 	node.appendChild(detailsNode);
 
 	// Increase index
-	index += size;
+	snaIndex += size;
 
 	// Append it
 	parseNode.appendChild(node);
 
 	// Install listener
-	detailsNode.addEventListener("toggle", htmlImgAndMemDump);
+//	detailsNode.addEventListener("toggle", htmlImgAndMemDump);
 }
 
+
+/**
+ * Retrieves the current node (paseNode) form the event and retrieves it's attributes:
+ * size, index.
+ * If parseNode has already been decoded parsenode is set to undefined.
+ */
+function getParseNodeIndex() {
+	// Get attributes
+	const indexString = parseNode.getAttribute('sna-index');
+	snaIndex = parseInt(indexString);
+}
+
+
+/**
+ * Returns if parse node not decoded yet.
+ */
+function getParseNodeDecoded(event): boolean {
+	const decodedString = event.target.getAttribute('sna-decoded');
+	if (decodedString)
+		return true;	// Is already decoded
+	// Is not decoded yet
+	parseNode = event.target;
+	return false;
+}
+
+
+/**
+ * Tags teh parse node as decoded.
+ */
+function setParseNodeDecoded() {
+	const decodedString = parseNode.getAttribute('sna-decoded');
+	if (decodedString) {
+		// Is already decoded
+		parseNode = undefined;
+		return;
+	}
+	// Set attribute
+	parseNode.setAttribute('sna-decoded', 'true');
+}
 
 
 //---- Parse the data (root level) --------
 function parseRoot() {
-	index = 0;
+	snaIndex = 0;
 	let divRoot = document.getElementById("div_root");
 	let html = '';
 
@@ -465,9 +628,9 @@ function parseRoot() {
 	if (zx128k) {
 		// ZX128K
 		// Memdumps
-		htmlMemDumpSummary("Bank5: 4000-7FFF", 0x4000, 0x4000);
-		htmlMemDumpSummary("Bank2: 8000-BFFF", 0x4000, 0x8000);
-		htmlMemDumpSummary("Bank" + pagedInBank.toString() + ": C000-FFFF", 0x4000, 0xC000);
+		//htmlMemDumpSummary("Bank5: 4000-7FFF", 0x4000, 0x4000);
+		//htmlMemDumpSummary("Bank2: 8000-BFFF", 0x4000, 0x8000);
+		//htmlMemDumpSummary("Bank" + pagedInBank.toString() + ": C000-FFFF", 0x4000, 0xC000);
 		// A few more registers
 		htmlWord("PC");
 		htmlByte("Port 7FFD");
@@ -477,20 +640,37 @@ function parseRoot() {
 			const p = getMemBankPermutation(i);
 			if (p == pagedInBank)
 				continue;	// skip already read bank
-			htmlMemDumpSummary("Bank" + p.toString() + ":", 0x4000);
+			//htmlMemDumpSummary("Bank" + p.toString() + ":", 0x4000);
 		}
 	}
 	else {
 		// ZX48K
 		//htmlImgAndMemDumpSummary("4000-7FFF", 0x4000, 0x4000);
-		htmlMemDumpSummary("4000-7FFF", 0x4000, 0x4000);
-		htmlMemDumpSummary("8000-BFFF", 0x4000, 0x8000);
-		htmlMemDumpSummary("C000-FFFF", 0x4000, 0xC000);
+		const index4000 = snaIndex;
+		htmlDetails("4000-7FFF", 0x4000, (event: any) => {
+			// Check if already decoded
+			if (!getParseNodeDecoded(event)) {
+				// Details as picture
+				htmlDetails("Screen", 0x4000, (event: any) => {
+					// Check if already decoded
+					if (!getParseNodeDecoded(event))
+						htmlMemDump(0x4000, 0x4000);
+				});
+				// Details as mem dump
+				htmlDetails("Memory Dump", 0x4000, (event: any) => {
+					// Check if already decoded
+					if (!getParseNodeDecoded(event))
+						htmlMemDump(0x4000, 0x4000);
+				});
+				// Set as decoded
+				setParseNodeDecoded();
+			}
+		});
+
+		//htmlMemDumpSummary("4000-7FFF", 0x4000, 0x4000);
+		//htmlMemDumpSummary("8000-BFFF", 0x4000, 0x8000);
+		//htmlMemDumpSummary("C000-FFFF", 0x4000, 0xC000);
 	}
-
-
-	var mygw = new ImageConvert(undefined);
-
 }
 
 
