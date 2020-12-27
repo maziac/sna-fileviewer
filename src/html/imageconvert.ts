@@ -1,8 +1,10 @@
+declare var gw: any;
+
 
 /**
  * Class which converts a pixel buffer into a gif image.
  */
-class ImageConvert implements gw.IOutputStream {
+export class ImageConvert{
 	buffer: number[] = [];
 	writeByte(b: number): void {
 		this.buffer.push(b);

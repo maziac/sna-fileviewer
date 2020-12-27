@@ -1,6 +1,8 @@
 declare var acquireVsCodeApi: any;
 declare var document: any;
 declare var window: any;
+declare var ImageConvert: any;
+declare var UlaScreen: any;
 
 const vscode = acquireVsCodeApi();
 
@@ -47,6 +49,18 @@ function mouseOverAddress(obj) {
 	});
 }
 */
+
+
+/**
+ * Convert array  to base 64.
+ */
+function arrayBufferToBase64(buffer) {
+	var binary = '';
+	var bytes = [].slice.call(new Uint8Array(buffer));
+	bytes.forEach((b) => binary += String.fromCharCode(b));
+	return window.btoa(binary);
+};
+
 
 //---- Parse functions. --------
 
@@ -179,6 +193,24 @@ function htmlMemDump(event: any) {
 	const size = parseInt(sizeString);
 	const offset = parseInt(offsetString);
 
+	// Image
+	let screenGifString = '';
+	try {
+		// Convert image
+		const ulaScreen = new UlaScreen(snaData, index);
+		const imgBuffer = ulaScreen.getUlaScreen();
+		// Create gif
+		const base64String = arrayBufferToBase64(imgBuffer);
+		// Add to html
+		node.innerHTML += '<img width="1024" height="1024" src="data:image/gif;base64,' + base64String + '">';
+	}
+	catch {
+		node.innerHTML += '<div class="error">Error converting image.</div>';
+	}
+
+
+
+
 	let html = ''; // '<div>';
 	let prevClose = '';
 
@@ -238,7 +270,7 @@ function htmlMemDump(event: any) {
 		html += '<div class="error indent">Error while parsing.</div>';
 	}
 
-		// Append
+	// Append
 	node.innerHTML += html;
 
 	/*
@@ -434,7 +466,7 @@ function parseRoot() {
 	}
 
 
-	//var mygw = new ImageConvert(undefined);
+	var mygw = new ImageConvert(undefined);
 
 }
 
