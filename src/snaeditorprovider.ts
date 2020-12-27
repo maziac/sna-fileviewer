@@ -61,7 +61,7 @@ export class SnaEditorProvider implements vscode.CustomReadonlyEditorProvider {
 		mainHtml = mainHtml.replace('${vscodeResPath}', vscodeResPath);
 
 		// Add a Reload button for debugging
-		mainHtml = mainHtml.replace('<body>', '<body> <button onclick="parseRoot()">Reload</button>');
+		//mainHtml = mainHtml.replace('<body>', '<body> <button onclick="parseRoot()">Reload</button>');
 
 		return mainHtml;
 	}

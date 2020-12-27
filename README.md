@@ -1,52 +1,37 @@
 # Support
 
-If you like "Z80 Instruction Set" please consider supporting it.
+If you like the "ZX SNA File Viewer" please consider supporting it.
 
 <a title="PayPal" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8S4R8HPXVCXUL&source=url">
 	<img src="assets/btn_donate_SM.gif" />
 </a>
 
 
-# Z80 Instruction Set
+# ZX SNA File Viewer
 
-This is a hover provider for vscode.
-I.e. if you hover over a Z80 instruction (e.g. "LD A,5") the opcode and a description for the instruction is displayed.
 
-![](assets/hover.jpg)
-
-Note: It does also show the opcodes for the Z80N instructions (ZX Spectrum Next).
+This extension adds a readonly file viewer for ZX Spectrum SNA, snapshot files.
+It shows registers, a memory dump and the included ZX screen.
+It can read 48K and 128K SNA files.
 
 
 ## Installation
 
 Install through Visual Studio Code Marketplace.
-The extension is called "Z80 Instruction Set".
-
-<!--
-It supports the following assembler file extensions:
-.asm, .s, .inc, .a80.
--->
+The extension is called "ZX SNA File Viewer".
 
 
-# Configuration
+# Usage
 
-- "z80-instruction-set.enableHovering": Enable/disable the hovering. I.e. enable/disable the extension.
-- "z80-instruction-set.z80Link": Link to Z80 documentation. You can change this e.g. to point to some other html documentation. This simply adds a link to all instruction to make it easier to open external documentation if the hover information is not sufficient. Use an empty string "" to disable.
+Just click on a file with the *.sna extension.
+The file is opened and shown in the text editor area.
 
+![](assets/usage.gif)
 
-# Misc
+Alternatively you can open a SNA file via "Open With...":
 
-To view all instructions open the command palette (press F1) and enter "Show all Z80 instructions".
-A WebView opens with the instructions.
+![](assets/usage-open-with.gif)
 
-![](assets/Z80InstructionsView.jpg)
+When hovering over a value or register name you will get additional info like the offset or the value in decimal:
 
-
-# Hovers in Debug Mode
-
-vscode turns the normal hovers off if in debug mode. To make them visible press the "ALT" key while hovering.
-
-
-# Acknowledgememts
-
-Main parts of the code (the z80 instruction decoding) has been taken from [theNuestro](https://github.com/theNestruo)'s [z80-asm-code-meter](https://github.com/theNestruo/z80-asm-meter-vscode) which is licensed under LGPL-3.0.
+![](assets/hovering.gif)
