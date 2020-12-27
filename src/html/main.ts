@@ -26,9 +26,6 @@ var snaData: number[];
 // Index into snaData
 var snaIndex: number;
 
-// Current size of data slice
-var snaSize: number;
-
 // The root node for parsing. new objects are appended here.
 var parseNode: any;
 
@@ -404,9 +401,6 @@ function htmlMemDump(size: number, offset = 0) {
 
 	// Append
 	parseNode.innerHTML += html;
-
-	// Set as decoded
-	setParseNodeDecoded();
 }
 
 
@@ -443,7 +437,7 @@ function htmlMemDumpSummary(title: string, size: number, offset?: number) {
  * @param title The title of the node.
  * @param size The size of the node.
  */
-function htmlDetails(title: string, size: number, func: (event: any) => void) {
+function htmlDetails(title: string, size: number, func: () => void) {
 	// Create new node
 	const detailsNode = document.createElement("DETAILS");
 	detailsNode.innerHTML = "<summary>" + title + "</summary>";
@@ -461,7 +455,11 @@ function htmlDetails(title: string, size: number, func: (event: any) => void) {
 	parseNode.appendChild(detailsNode);
 
 	// Install listener
-	detailsNode.addEventListener("toggle", func);
+	detailsNode.addEventListener("toggle", function handler(event: any) {
+		parseNode = event.target;
+		func();
+		this.removeEventListener("toggle", handler);
+	});
 }
 
 
@@ -501,34 +499,6 @@ function getParseNodeIndex() {
 	// Get attributes
 	const indexString = parseNode.getAttribute('sna-index');
 	snaIndex = parseInt(indexString);
-}
-
-
-/**
- * Returns if parse node not decoded yet.
- */
-function getParseNodeDecoded(event): boolean {
-	const decodedString = event.target.getAttribute('sna-decoded');
-	if (decodedString)
-		return true;	// Is already decoded
-	// Is not decoded yet
-	parseNode = event.target;
-	return false;
-}
-
-
-/**
- * Tags teh parse node as decoded.
- */
-function setParseNodeDecoded() {
-	const decodedString = parseNode.getAttribute('sna-decoded');
-	if (decodedString) {
-		// Is already decoded
-		parseNode = undefined;
-		return;
-	}
-	// Set attribute
-	parseNode.setAttribute('sna-decoded', 'true');
 }
 
 
@@ -647,24 +617,15 @@ function parseRoot() {
 		// ZX48K
 		//htmlImgAndMemDumpSummary("4000-7FFF", 0x4000, 0x4000);
 		const index4000 = snaIndex;
-		htmlDetails("4000-7FFF", 0x4000, (event: any) => {
-			// Check if already decoded
-			if (!getParseNodeDecoded(event)) {
-				// Details as picture
-				htmlDetails("Screen", 0x4000, (event: any) => {
-					// Check if already decoded
-					if (!getParseNodeDecoded(event))
-						htmlMemDump(0x4000, 0x4000);
-				});
-				// Details as mem dump
-				htmlDetails("Memory Dump", 0x4000, (event: any) => {
-					// Check if already decoded
-					if (!getParseNodeDecoded(event))
-						htmlMemDump(0x4000, 0x4000);
-				});
-				// Set as decoded
-				setParseNodeDecoded();
-			}
+		htmlDetails("4000-7FFF", 0x4000, () => {
+			// Details as picture
+			htmlDetails("Screen", 0x4000, () => {
+				htmlMemDump(0x4000, 0x4000);
+			});
+			// Details as mem dump
+			htmlDetails("Memory Dump", 0x4000, () => {
+				htmlMemDump(0x4000, 0x4000);
+			});
 		});
 
 		//htmlMemDumpSummary("4000-7FFF", 0x4000, 0x4000);
