@@ -18,10 +18,10 @@ const vscode = acquireVsCodeApi();
 
 
 // The data to parse.
-var snaData: number[];
+var dataBuffer: number[];
 
 // Index into snaData
-var snaIndex: number;
+var dataIndex: number;
 
 // The root node for parsing. new objects are appended here.
 var parseNode: any;
@@ -77,7 +77,7 @@ function htmlTitleValue(title: string, value: number, size: number, hoverTitleSt
 
 	if (hoverTitleString == undefined) {
 		// Add index as hover string
-		const previndex = snaIndex - size;
+		const previndex = dataIndex - size;
 		hoverTitleString = title + '\nIndex (hex): ' + getHexString(previndex, 4) + '\nIndex (dec): ' + previndex;
 	}
 	if (hoverValueString == undefined)
@@ -106,11 +106,11 @@ function htmlTitleValue(title: string, value: number, size: number, hoverTitleSt
  * @param size The number of bytes to read.
  */
 function readData(size: number) {
-	let value = snaData[snaIndex++];
+	let value = dataBuffer[dataIndex++];
 	let factor = 1;
 	for (let i = 1; i < size; i++) {
 		factor *= 256;
-		value += factor * snaData[snaIndex++];
+		value += factor * dataBuffer[dataIndex++];
 	}
 	return value;
 }
@@ -151,9 +151,9 @@ function htmlMemDump(size: number, offset = 0) {
 		for (let i = 0; i < size; i++) {
 			const k = i % 16;
 			// Get value
-			const iIndex = snaIndex + i;	// For indexing
+			const iIndex = dataIndex + i;	// For indexing
 			const iOffset = offset + i;	// For display
-			const val = snaData[iIndex];
+			const val = dataBuffer[iIndex];
 			const valString = getHexString(val, 2);
 			const valIntString = val.toString();
 
@@ -168,7 +168,7 @@ function htmlMemDump(size: number, offset = 0) {
 				// Check for same values
 				let l = i + 1
 				for (; l < size; l++) {
-					if (val != snaData[snaIndex + l])
+					if (val != dataBuffer[dataIndex + l])
 						break;
 				}
 				const l16 = l - (l % 16);
@@ -219,11 +219,11 @@ function htmlDetails(title: string, size: number, func: () => void) {
 	detailsNode.classList.add("indent");
 
 	// Set attributes
-	detailsNode.setAttribute('sna-index', snaIndex.toString());
+	detailsNode.setAttribute('sna-index', dataIndex.toString());
 	//detailsNode.setAttribute('sna-size', size.toString());
 
 	// Increase index
-	snaIndex += size;
+	dataIndex += size;
 
 	// Append it
 	parseNode.appendChild(detailsNode);
@@ -233,7 +233,7 @@ function htmlDetails(title: string, size: number, func: () => void) {
 		// Get parse node and index
 		parseNode = event.target;
 		const indexString = parseNode.getAttribute('sna-index');
-		snaIndex = parseInt(indexString);
+		dataIndex = parseInt(indexString);
 		func();
 		this.removeEventListener("toggle", handler);
 	});
@@ -252,8 +252,8 @@ window.addEventListener('message', event => {
 		case 'setData':
 			{
 				// Store in global variable
-				snaData = message.snaData;
-				snaIndex = 0;
+				dataBuffer = message.snaData;
+				dataIndex = 0;
 				// Parse
 				parseRoot();
 			} break;

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import {SnaEditorProvider} from './snaeditorprovider';
+import {EditorProvider} from './editorprovider';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -12,7 +12,7 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     // Register custom readonly editor provider
-    const viewProvider = new SnaEditorProvider();
+    const viewProvider = new EditorProvider();
     vscode.window.registerCustomEditorProvider('sna-fileviewer.viewer', viewProvider, {webviewOptions: {enableFindWidget: true}});
 }
 

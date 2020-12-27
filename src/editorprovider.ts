@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
 import * as path from 'path';
 import {readFileSync} from 'fs';
-import {SnaDocument} from "./snadocument";
+import {EditorDocument} from "./editordocument";
 
 
-export class SnaEditorProvider implements vscode.CustomReadonlyEditorProvider {
+export class EditorProvider implements vscode.CustomReadonlyEditorProvider {
 
 	/**
 	 * Called by vscode when a file is opened.
@@ -12,7 +12,7 @@ export class SnaEditorProvider implements vscode.CustomReadonlyEditorProvider {
 	 */
 	public openCustomDocument(uri: vscode.Uri, openContext: vscode.CustomDocumentOpenContext, token: vscode.CancellationToken): vscode.CustomDocument | Thenable<vscode.CustomDocument> {
 		// Return a SnaDocument
-		const snaDoc = new SnaDocument();
+		const snaDoc = new EditorDocument();
 		snaDoc.uri = uri;
 		return snaDoc;
 	}
@@ -23,7 +23,7 @@ export class SnaEditorProvider implements vscode.CustomReadonlyEditorProvider {
 	 * Here vscode gives us the webview.
 	 */
 	public resolveCustomEditor(document: vscode.CustomDocument, webviewPanel: vscode.WebviewPanel, token: vscode.CancellationToken): void | Thenable<void> {
-		const snaDoc = document as SnaDocument;
+		const snaDoc = document as EditorDocument;
 
 		// Allow js
 		webviewPanel.webview.options = {

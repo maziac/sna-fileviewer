@@ -12,26 +12,6 @@
             "sourceMaps": true,
             "outFiles": [ "${workspaceRoot}/out/**/*.js" ],
             //"preLaunchTask": "npm"
-        },
-
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Tests",
-            "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-            "args": [
-                "-u",
-                "tdd",
-                "--timeout",
-                "999999",
-                "--colors",
-                "./out/tests/"
-            ],
-            "outFiles": [
-                "${workspaceFolder}/out/**/*.js"
-            ],
-            "internalConsoleOptions": "openOnSessionStart"
         }
     ]
 }

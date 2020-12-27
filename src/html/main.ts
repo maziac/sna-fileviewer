@@ -4,8 +4,8 @@ declare var window: any;
 declare var ImageConvert: any;
 declare var UlaScreen: any;
 
-declare var snaData: number[];
-declare var snaIndex: number;
+declare var dataBuffer: number[];
+declare var dataIndex: number;
 declare var parseNode: any;
 
 
@@ -36,7 +36,7 @@ function htmlUlaScreen() {
 	// Image
 	try {
 		// Convert image
-		const ulaScreen = new UlaScreen(snaData, snaIndex);
+		const ulaScreen = new UlaScreen(dataBuffer, dataIndex);
 		const imgBuffer = ulaScreen.getUlaScreen();
 		// Create gif
 		const base64String = arrayBufferToBase64(imgBuffer);
@@ -55,7 +55,7 @@ function parseRoot() {
 	let html = '';
 
 	// Check length. ZX48K or ZX128K
-	const length = snaData.length;
+	const length = dataBuffer.length;
 	html += '<div><b>';
 	let zx128k = false;
 	if (length == 49179) {
@@ -80,7 +80,7 @@ function parseRoot() {
 		// Used banks
 		html += '<div>Banks: 5, 2, ';
 		// Get used bank
-		const port7FFD = snaData[49181];
+		const port7FFD = dataBuffer[49181];
 		pagedInBank = port7FFD & 0x03;
 		html += pagedInBank.toString();
 		// Remaining banks
@@ -124,7 +124,7 @@ function parseRoot() {
 		if (sp >= 0x4000) {
 			const snaHeaderLength = 27;
 			const pcIndex = snaHeaderLength + sp - 0x4000;
-			const pc = snaData[pcIndex] + 256 * snaData[pcIndex + 1];
+			const pc = dataBuffer[pcIndex] + 256 * dataBuffer[pcIndex + 1];
 			pcNode = htmlTitleValue("PC", pc, 2, hoverPcText);
 		}
 		else {
@@ -145,13 +145,13 @@ function parseRoot() {
 		// ZX128K
 		// Memdumps
 		htmlDetails("Bank5: 4000-7FFF", 0x4000, () => {
-			const index = snaIndex;	// Save
+			const index = dataIndex;	// Save
 			// Details as picture
 			htmlDetails("Screen", 0x4000, () => {
 				htmlUlaScreen();
 			});
 			// Details as mem dump
-			snaIndex = index;	// Restore
+			dataIndex = index;	// Restore
 			htmlDetails("Memory Dump", 0x4000, () => {
 				htmlMemDump(0x4000, 0x4000);
 			});
@@ -180,14 +180,14 @@ function parseRoot() {
 		// ZX48K
 		const mem4000 =
 		htmlDetails("4000-7FFF", 0x4000, () => {
-			const index = snaIndex;	// Save
+			const index = dataIndex;	// Save
 			// Details as picture
 			const screen =
 			htmlDetails("Screen", 0x4000, () => {
 				htmlUlaScreen();
 			});
 			// Details as mem dump
-			snaIndex = index;	// Restore
+			dataIndex = index;	// Restore
 			htmlDetails("Memory Dump", 0x4000, () => {
 				htmlMemDump(0x4000, 0x4000);
 			});
