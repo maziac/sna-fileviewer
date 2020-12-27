@@ -66,6 +66,7 @@
         "vscode-test": "^1.4.1"
     },
     "dependencies": {
+        "gif-writer": "^0.9.4",
         "path": "^0.12.7"
     }
 }
