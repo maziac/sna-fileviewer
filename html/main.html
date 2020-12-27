@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<base href="${vscodeResPath}/">
-	<link rel="stylesheet" href="main.css">
+	<link rel="stylesheet" href="html/main.css">
 </head>
 
 <body>
@@ -12,6 +12,18 @@
 	</div>
 </body>
 
-<script src="main.js"></script>
+<!-- "import" Gif Writer: import * as gw from "gif-writer" -->
+<script>
+	var exports = {};
+</script>
+<script src="node_modules/gif-writer/GifWriter.js"></script>
+<script>
+	// Access Gif Writer via gw
+	var gw = exports;
+</script>
+<!-- end of "import" -->
+
+<script src="html/imageconvert.js"></script>
+<script src="html/main.js"></script>
 
 </html>

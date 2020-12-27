@@ -1,5 +1,16 @@
 const vscode = acquireVsCodeApi();
 
+
+/**
+ * This js script parses a file, does all the decoding and presents the
+ * data in the webview.
+ * It is done as script inside the webview (opposed to creating a html file in
+ * the extension) to allow lazy loading.
+ * Large blocks of data are skipped in the initial pass and decoded only
+ * when needed. I.e. when the user expands an item.
+ */
+
+
 // Initialize variables
 
 // Index into snaData
@@ -417,6 +428,10 @@ function parseRoot() {
 		htmlMemDumpSummary("8000-BFFF", 0x4000, 0x8000);
 		htmlMemDumpSummary("C000-FFFF", 0x4000, 0xC000);
 	}
+
+
+	var mygw = new ImageConvert(undefined);
+
 }
 
 
@@ -435,3 +450,4 @@ window.addEventListener('message', event => {
 			} break;
 	}
 });
+

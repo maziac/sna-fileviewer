@@ -48,7 +48,7 @@ export class SnaEditorProvider implements vscode.CustomReadonlyEditorProvider {
 
 
 	/**
-	 * Sets the html code to display the text.
+	 * Returns the html code to display the text.
 	 */
 	protected getMainHtml(webviewPanel) {
 		// Add the html styles etc.
@@ -56,11 +56,12 @@ export class SnaEditorProvider implements vscode.CustomReadonlyEditorProvider {
 		const mainHtmlFile = path.join(extPath, 'html/main.html');
 		let mainHtml = readFileSync(mainHtmlFile).toString();
 		// Exchange local path
-		const resourcePath = vscode.Uri.file(path.join(extPath, 'html'));
+		const resourcePath = vscode.Uri.file(extPath);
 		const vscodeResPath = webviewPanel.webview.asWebviewUri(resourcePath).toString();
 		mainHtml = mainHtml.replace('${vscodeResPath}', vscodeResPath);
+
 		// Add a Reload button for debugging
-		//mainHtml = mainHtml.replace('<body>', '<body> <button onclick="parseRoot()">Reload</button>');
+		mainHtml = mainHtml.replace('<body>', '<body> <button onclick="parseRoot()">Reload</button>');
 
 		return mainHtml;
 	}
