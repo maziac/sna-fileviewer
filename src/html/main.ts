@@ -298,6 +298,9 @@ function htmlDetails(title: string, size: number, func: () => void) {
 		func();
 		this.removeEventListener("toggle", handler);
 	});
+
+	// Return
+	return detailsNode;
 }
 
 
@@ -431,9 +434,11 @@ function parseRoot() {
 	}
 	else {
 		// ZX48K
+		const mem4000 =
 		htmlDetails("4000-7FFF", 0x4000, () => {
 			const index = snaIndex;	// Save
 			// Details as picture
+			const screen =
 			htmlDetails("Screen", 0x4000, () => {
 				htmlUlaScreen();
 			});
@@ -442,6 +447,8 @@ function parseRoot() {
 			htmlDetails("Memory Dump", 0x4000, () => {
 				htmlMemDump(0x4000, 0x4000);
 			});
+			// Open screen by default
+			screen.open = true;
 		});
 		htmlDetails("8000-BFFF", 0x4000, () => {
 			htmlMemDump(0x4000, 0x8000);
@@ -449,6 +456,9 @@ function parseRoot() {
 		htmlDetails("C000-FFFF", 0x4000, () => {
 			htmlMemDump(0x4000, 0xC000);
 		});
+
+		// Open the loading screen
+		mem4000.open = true;
 	}
 }
 
