@@ -6,4 +6,4 @@ src/**
 **/*.map
 .gitignore
 tsconfig.json
-
+notes.md
