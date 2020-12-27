@@ -65,14 +65,17 @@ function htmlTitleValue(title: string, value: number, size: number, hoverTitleSt
 	const digitSize = 2 * size;
 	let valString;
 	let valIntString;
-	let titleString = '';
-	if (value == undefined) {
+	let additionalClass;
+	if (value == undefined || isNaN(value)) {
 		valString = ''.padStart(digitSize, '?');
 		valIntString = '?';
+		additionalClass = 'class="error"';
+		hoverValueString = 'Error while parsing.';
 	}
 	else {
 		valIntString = value.toString() + ' (dec)';
 		valString = getHexString(value, digitSize);
+		let additionalClass = '';
 	}
 
 	if (hoverTitleString == undefined) {
@@ -89,7 +92,7 @@ function htmlTitleValue(title: string, value: number, size: number, hoverTitleSt
 	const html = `
 <div class="simple_value_title indent" title="${hoverTitleString}">${title}:</div>
 <div>&nbsp;</div>
-<div title="${hoverValueString}">${valString}</div>
+<div title="${hoverValueString}" ${additionalClass}>${valString}</div>
 `;
 	node.innerHTML = html;
 
@@ -219,7 +222,7 @@ function htmlDetails(title: string, size: number, func: () => void) {
 	detailsNode.classList.add("indent");
 
 	// Set attributes
-	detailsNode.setAttribute('sna-index', dataIndex.toString());
+	detailsNode.setAttribute('data-index', dataIndex.toString());
 	//detailsNode.setAttribute('sna-size', size.toString());
 
 	// Increase index
@@ -232,7 +235,7 @@ function htmlDetails(title: string, size: number, func: () => void) {
 	detailsNode.addEventListener("toggle", function handler(event: any) {
 		// Get parse node and index
 		parseNode = event.target;
-		const indexString = parseNode.getAttribute('sna-index');
+		const indexString = parseNode.getAttribute('data-index');
 		dataIndex = parseInt(indexString);
 		func();
 		this.removeEventListener("toggle", handler);

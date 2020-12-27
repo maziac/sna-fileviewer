@@ -13,6 +13,9 @@ export class UlaScreen {
 	// Screen width
 	public static SCREEN_WIDTH=256;
 
+	// Number of bytes occupied by a screen.
+	public static SCREEN_SIZE = UlaScreen.SCREEN_HEIGHT * UlaScreen.SCREEN_WIDTH / 8 + UlaScreen.SCREEN_HEIGHT / 8 * UlaScreen.SCREEN_WIDTH / 8;
+
 	// Pointer to the memory class.
 	protected memory: number[];
 

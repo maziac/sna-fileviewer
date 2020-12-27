@@ -35,6 +35,9 @@ function getMemBankPermutation(i: number): number {
 function htmlUlaScreen() {
 	// Image
 	try {
+		// Check size
+		if (dataIndex + UlaScreen.SCREEN_SIZE > dataBuffer.length)
+			throw Error();
 		// Convert image
 		const ulaScreen = new UlaScreen(dataBuffer, dataIndex);
 		const imgBuffer = ulaScreen.getUlaScreen();

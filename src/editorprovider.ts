@@ -37,7 +37,6 @@ export class EditorProvider implements vscode.CustomReadonlyEditorProvider {
 		// Create html code
 		const html = this.getMainHtml(webviewPanel);
 		webviewPanel.webview.html = html;
-
 		// Parse data
 		const message = {
 			command: 'setData',

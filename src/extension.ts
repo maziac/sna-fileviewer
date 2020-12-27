@@ -18,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 /**
- * Reads the confguration.
+ * Reads the configuration.
  */
 function configure(context: vscode.ExtensionContext, event?) {
     /*

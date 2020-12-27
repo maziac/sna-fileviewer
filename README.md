@@ -9,10 +9,12 @@ If you like the "ZX SNA File Viewer" please consider supporting it.
 
 # ZX SNA File Viewer
 
-
 This extension adds a readonly file viewer for ZX Spectrum SNA, snapshot files.
 It shows registers, a memory dump and the included ZX screen.
 It can read 48K and 128K SNA files.
+
+The SNA file format specification can be found [here](https://worldofspectrum.org/faq/reference/formats.htm).
+
 
 
 ## Installation
