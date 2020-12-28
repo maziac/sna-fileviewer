@@ -6,7 +6,7 @@
         {
             "type": "npm",
             "label": "npm",
-            "script": "webpack-dev",
+            "script": "watch",
             "problemMatcher": [
                 "$tsc-watch"
             ],
