@@ -24,9 +24,6 @@ var dataBuffer: number[];
 // Index into snaData
 var lastOffset: number;
 
-// The last retrieved data value.
-var lastValue: number;
-
 // The last retrieved data size.
 var lastSize: number;
 
@@ -73,7 +70,7 @@ function arrayBufferToBase64(buffer) {
 
 
 /**
- * Creates a node and appends it to parseNode.
+ * Creates a node and appends it to lastNode.
  * @param name The name of the value. E.g. "SP".
  * @param valString The value to show.
  * @param shortDescription A short description of the entry.
@@ -206,34 +203,9 @@ function addDelayedDetailsParsing(func: () => void) {
 
 
 /**
- * Creates a simple line of contents.
- * @param a
- */
-function createLine(a: string, b?: string) {
-	// Create new node
-	const node = document.createElement("DIV");
-	if (b) {
-		node.classList.add("content");
-		const html = `
-<div>${a}</div>
-<div>${b}</div>
-`;
-		node.innerHTML = html;
-	}
-	else {
-		// Just one element
-		node.innerHTML = a;
-	}
-	// Append it
-	lastNode.appendChild(node);
-}
-
-
-
-/**
  * Creates a description line of contents.
  * Is gray.
- * @param a
+ * @param descr The description string. Any linebreaks are converted into '<br>'.
  */
 function createDescription(descr: string) {
 	// Create new node
@@ -247,17 +219,6 @@ function createDescription(descr: string) {
 }
 
 
-
-
-/**
- * Adds a hover text to lastTitleNode.
- * @param hoverTitleString String to show on hover for the title. Can be undefined.
- */
-function addHoverTitle(hoverTitleString: string) {
-	lastNameNode.title = hoverTitleString;
-}
-
-
 /**
  * Adds a hover text to lastValueNode.
  * @param hoverValueString String to show on hover for the title. Can be undefined.
@@ -265,7 +226,6 @@ function addHoverTitle(hoverTitleString: string) {
 function addHoverValue(hoverValueString: string) {
 	lastValueNode.title = hoverValueString;
 }
-
 
 
 /**
@@ -283,16 +243,6 @@ function getHexString(value: number, size: number): string {
 
 
 /**
- * Converts index into a string that can be used as hover string.
- */
-function getIndexHoverString(i: number): string {
-	const s = 'Index (hex): ' + getHexString(i, 4) + '\nIndex (dec): ' + i;
-	return s;
-}
-
-
-
-/**
  * Advances the offset (from previous call) and
  * stores the size for reading.
  * @param size The number of bytes to read.
@@ -307,15 +257,14 @@ function read(size: number) {
  * Reads the value from the buffer.
  */
 function getValue(): number {
-	lastValue = dataBuffer[lastOffset];
+	let value = dataBuffer[lastOffset];
 	let factor = 1;
 	for (let i = 1; i < lastSize; i++) {
 		factor *= 256;
-		lastValue += factor * dataBuffer[lastOffset + i];
+		value += factor * dataBuffer[lastOffset + i];
 	}
-	return lastValue;	// TODO: lastValue not required ?
+	return value;
 }
-
 
 
 /**
@@ -476,52 +425,13 @@ function createMemDump(displayOffset = 0, hoverRelativeOffset = 'Relative Offset
 
 
 /**
- * Creates a collapsible summary/details node.
- * @param title The title of the node.
- * @param size The size of the node.
- */
-function htmlDetails(title: string, size: number, func?: () => void) {
-	// Create new node
-	const detailsNode = document.createElement("DETAILS");
-	detailsNode.innerHTML = "<summary>" + title + "</summary>";
-	// Indent
-	detailsNode.classList.add("indent");
-
-	// Set attributes
-	detailsNode.setAttribute('data-index', lastOffset.toString());
-	//detailsNode.setAttribute('sna-size', size.toString());
-
-	// Increase index
-	lastOffset += size;
-
-	// Append it
-	lastNode.appendChild(detailsNode);
-
-	// Install listener
-	if (func) {
-		detailsNode.addEventListener("toggle", function handler(event: any) {
-			// Get parse node and index
-			lastNode = event.target;
-			const indexString = lastNode.getAttribute('data-index');
-			lastOffset = parseInt(indexString);
-			func();
-			this.removeEventListener("toggle", handler);
-		});
-	}
-
-	// Return
-	return detailsNode;
-}
-
-
-/**
  * Starts the parsing.
  */
 function parseStart() {
 	// Reset
 	lastOffset = 0;
 	lastSize = 0;
-	lastNode = undefined;
+	lastNode = document.getElementById("div_root");
 	// Parse
 	parseRoot();
 }
@@ -551,3 +461,8 @@ window.addEventListener('message', event => {
 	}
 });
 
+// At the end send a message to indicate that the webview is ready to receive
+// data.
+vscode.postMessage({
+	command: 'ready'
+});

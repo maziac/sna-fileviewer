@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.0
+- Aligned with nex file viewer.
+
 ## 1.0.1
 - Fixed tasks.json.
 - Parsing errors highlighted.
