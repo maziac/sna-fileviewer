@@ -54,7 +54,7 @@ function htmlUlaScreen() {
 
 //---- Parse the data (root level) --------
 function parseRoot() {
-	let divRoot = document.getElementById("div_root");
+	parseNode = document.getElementById("div_root");
 	let html = '';
 
 	// Check length. ZX48K or ZX128K
@@ -100,10 +100,9 @@ function parseRoot() {
 	// End meta info
 	//html += '<hr>';
 	html += '<br>';
-	divRoot.innerHTML = html;
+	parseNode.innerHTML = html;
 
 	// Get registers
-	parseNode = divRoot;
 	htmlByte("I");
 	htmlWord("HL'");
 	htmlWord("DE'");
