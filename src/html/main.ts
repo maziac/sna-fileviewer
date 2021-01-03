@@ -112,26 +112,25 @@ function parseRoot() {
 			const sp = getValue();
 			createNode("SP", hex0xValue(), "Stack Pointer");
 
-			/*
 			// Print PC if ZX48K
 			if (!zx128k) {
-				const hoverPcText = 'PC is derived from the location SP points to.';
-				let pcNode;
+				let pcValString;
+				let descr = 'PC is derived from the location SP points to.';
 				if (sp >= 0x4000) {
 					const snaHeaderLength = 27;
 					const pcIndex = snaHeaderLength + sp - 0x4000;
 					const pc = dataBuffer[pcIndex] + 256 * dataBuffer[pcIndex + 1];
-					pcNode = htmlTitleValue("PC", pc, 2, hoverPcText);
+					pcValString = getHexString(pc, 4);
 				}
 				else {
-					pcNode = htmlTitleValue("PC", undefined, 2, hoverPcText, "SP points to ROM. Can't decode PC.");
+					pcValString = 'UNKNOWN';
+					descr += " SP points to ROM. Can't decode.";
 				}
+				const keyNode = createSimpleRow('PC', pcValString, descr);
 				// Indent
-				const keyNode = pcNode.firstElementChild;
 				keyNode.classList.add("indent");
-				pcNode.classList.add("gray");
+				keyNode.classList.add("gray");
 			}
-			*/
 
 			read(1);
 			createNode("IM", hex0xValue(), "Interrupt Mode (0=IM0/1=IM1/2=IM2)");

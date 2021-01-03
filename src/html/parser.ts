@@ -79,7 +79,6 @@ function createNode(name: string, valString = '', shortDescription = '') {
 	// Create new node
 	const node = document.createElement("DETAILS");
 	node.classList.add("nomarker");
-	//node.classList.add("basenode");
 	const lastOffsetHex = getHexString(lastOffset, 4);
 	const lastSizeHex = getHexString(lastSize, 4);
 	const html = `
@@ -216,6 +215,48 @@ function createDescription(descr: string) {
 	node.classList.add('gray');
 	// Append it
 	lastNode.appendChild(node);
+}
+
+
+/**
+ * Creates an element with a number of columns.
+ * Without any index and size columns.
+ * @param name The name of the value. E.g. "SP".
+ * @param valString The value to show.
+ * @param shortDescription A short description of the entry.
+ */
+function createSimpleRow(name: string, valString = '', shortDescription = '') {
+	// Create new node
+	const node = document.createElement("DETAILS");
+	node.classList.add("nomarker");
+	const html = `
+<summary>
+	<div class="offset"></div>
+	<div class="size"></div>
+	<div class="name">${name}</div>
+	<div class="value">${valString}</div>
+	<div class="description">${shortDescription}</div>
+</summary>
+<div class="indent"></div>
+`;
+	node.innerHTML = html;
+
+	// Get child objects
+	const childrenNode = node.childNodes;
+	lastContentNode = childrenNode[3];
+	const summary = childrenNode[1];
+	const children = summary.childNodes;
+	lastNameNode = children[5];
+	lastValueNode = children[7];
+	lastDescriptionNode = children[9];
+	const descriptionChildren = lastDescriptionNode.childNodes;
+	lastLongDescriptionNode = descriptionChildren[3];
+
+	// Append it
+	lastNode.appendChild(node);
+
+	// Return
+	return node;
 }
 
 
