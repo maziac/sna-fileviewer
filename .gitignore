@@ -4,7 +4,7 @@ out/
 dist/
 testsna/
 npm-debug.log
-*.vsix
+/*.vsix
 logs/
 coverage/
 .nyc_output/
