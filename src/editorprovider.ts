@@ -37,13 +37,18 @@ export class EditorProvider implements vscode.CustomReadonlyEditorProvider {
 		webviewPanel.webview.onDidReceiveMessage(message => {
 			switch (message.command) {
 				case 'ready':
-					// Send file data to webview
-					const snaData = readFileSync(filePath);
-					const message = {
-						command: 'setData',
-						snaData: [...snaData]
-					};
-					webviewPanel.webview.postMessage(message);
+					// Send data
+					this.sendDataToWebView(filePath, webviewPanel);
+					// Establish file watcher to check for changes
+					const fsWatcher = vscode.workspace.createFileSystemWatcher(filePath, true, false, true);
+					fsWatcher.onDidChange(() => {
+						// Re-read data
+						this.sendDataToWebView(filePath, webviewPanel);
+					});
+					// Cleanup
+					webviewPanel.onDidDispose(() => {
+						fsWatcher.dispose();
+					});
 					break;
 			}
 		});
@@ -51,6 +56,22 @@ export class EditorProvider implements vscode.CustomReadonlyEditorProvider {
 		// Create html code
 		const html = this.getMainHtml(webviewPanel);
 		webviewPanel.webview.html = html;
+	}
+
+
+	/**
+	 * Reads the file and sends the data to the webview.
+	 * @param filePath The file name.
+	 * @param webviewPanel The webview to send the data to.
+	 */
+	protected sendDataToWebView(filePath: string, webviewPanel: vscode.WebviewPanel) {
+		// Send file data to webview
+		const snaData = readFileSync(filePath);
+		const message = {
+			command: 'setData',
+			snaData: [...snaData]
+		};
+		webviewPanel.webview.postMessage(message);
 	}
 
 

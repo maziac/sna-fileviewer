@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.0
+- SNA file viewer will update automatically if file changes in background.
+
 ## 1.1.0
 - Aligned with nex file viewer.
 
