@@ -3,6 +3,7 @@
 
 ## 1.2.1
 - vscode category changed.
+- buttons added.
 
 ## 1.2.0
 - SNA file viewer will update automatically if file changes in background.

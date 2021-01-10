@@ -1,6 +1,6 @@
 declare var acquireVsCodeApi: any;
-declare var document: any;
-declare var window: any;
+declare var document: Document;
+declare var window: Window & typeof globalThis;;
 declare var ImageConvert: any;
 declare var UlaScreen: any;
 

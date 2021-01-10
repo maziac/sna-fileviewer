@@ -1,7 +1,7 @@
 declare var acquireVsCodeApi: any;
-declare var document: any;
-declare var window: any;
-declare var navigator: any;
+declare var document: Document;
+declare var window: Window & typeof globalThis;
+declare var navigator: Navigator;
 declare var ImageConvert: any;
 declare var UlaScreen: any;
 
@@ -75,10 +75,11 @@ function arrayBufferToBase64(buffer) {
  * @param valString The value to show.
  * @param shortDescription A short description of the entry.
  */
-function createNode(name: string, valString = '', shortDescription = '') {
+function createNode(name: string, valString = '', shortDescription = ''): HTMLDetailsElement {
 	// Create new node
-	const node = document.createElement("DETAILS");
+	const node = document.createElement("DETAILS") as HTMLDetailsElement;
 	node.classList.add("nomarker");
+	//node.classList.add("basenode");
 	const lastOffsetHex = getHexString(lastOffset, 4);
 	const lastSizeHex = getHexString(lastSize, 4);
 	const html = `
@@ -181,14 +182,14 @@ function addDetailsParsing(func: () => void) {
  * @param func The function to call to parse/decode the data.
  */
 function addDelayedDetailsParsing(func: () => void) {
-	// Get node
+	// Get nodex
 	const detailsNode = lastNode.lastChild;
 	detailsNode.classList.remove("nomarker");
 	// Attach attribute
 	detailsNode.setAttribute('data-index', lastOffset.toString());
 	// Install listener
 	if (func) {
-		detailsNode.addEventListener("toggle", function handler(event: any) {
+		detailsNode.addEventListener("toggle", function handler(this: any, event: any) {
 			// Get parse node and index
 			lastNode = event.target;
 			const indexString = lastNode.getAttribute('data-index');
@@ -345,6 +346,8 @@ function bitValue(bit: number): string {
 	return result;
 }
 
+function keypbitValue(bit: number) {
+}
 
 /**
  * Converts a value into a bit string.
