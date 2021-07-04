@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register custom readonly editor provider
     const viewProvider = new EditorProvider();
-    vscode.window.registerCustomEditorProvider('sna-fileviewer.viewer', viewProvider, {webviewOptions: {enableFindWidget: true}});
+    vscode.window.registerCustomEditorProvider('sna-fileviewer.viewer', viewProvider, {webviewOptions: {enableFindWidget: true, retainContextWhenHidden: true}});
 }
 
 

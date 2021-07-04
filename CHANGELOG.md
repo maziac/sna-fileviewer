@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.0
+- Contents remains even if editor is hidden.
+
 ## 1.3.0
 - Supporting vscode workspace trust.
 
