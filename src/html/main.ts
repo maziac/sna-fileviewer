@@ -1,9 +1,4 @@
-declare var window: Window & typeof globalThis;
-
-declare var dataBuffer: number[];
-declare var lastNode: any;
-
-import {assert, getValue, getHexString, read, createNode, addDetailsParsing, hex0xValue, createSimpleRow, addHoverValue, addDelayedDetailsParsing, createMemDump, lastOffset, parseInit} from "./parser";
+import {assert, getValue, getHexString, read, createNode, addDetailsParsing, hex0xValue, createSimpleRow, addHoverValue, addDelayedDetailsParsing, createMemDump, lastOffset, parseInit, dataBuffer, lastNode} from "./parser";
 import {createUlaScreen, getMemBankPermutation, zxColorValue} from './zxspecific';
 
 

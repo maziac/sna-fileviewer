@@ -17,26 +17,26 @@ export let dataBuffer: number[];
 // Index into snaData
 export let lastOffset: number;
 
-// The last retrieved data size.
-var lastSize: number;
-
 // The root node for parsing. New objects are appended here.
 export let lastNode: any;
 
+// The last retrieved data size.
+let lastSize: number;
+
 // The correspondent node for the details.
-var lastContentNode: any;
+let lastContentNode: any;
 
 // The last node used for the title.
-var lastNameNode: any;
+let lastNameNode: any;
 
 // The last node used for the value.
-var lastValueNode: any;
+let lastValueNode: any;
 
 // The last node used for the short description.
-var lastDescriptionNode: any;
+let lastDescriptionNode: any;
 
 // The last node used for the long description.
-var lastLongDescriptionNode: any;
+let lastLongDescriptionNode: any;
 
 
 /**
@@ -111,7 +111,6 @@ export function createNode(name: string, valString = '', shortDescription = ''):
  * Will be shown when expanded.
  */
 export function addDescription(longDescription: string) {
-	//lastLongDescriptionNode.innerHTML = longDescription;
 	beginDetails();
 	createDescription(convertLineBreaks(longDescription));
 	endDetails();
