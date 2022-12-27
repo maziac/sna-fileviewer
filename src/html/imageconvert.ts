@@ -1,4 +1,5 @@
-declare var gw: any;
+import * as gw from 'gif-writer';
+
 
 
 /**

@@ -1,13 +1,10 @@
-declare var acquireVsCodeApi: any;
-declare var document: Document;
-declare var window: Window & typeof globalThis;;
-declare var ImageConvert: any;
-declare var UlaScreen: any;
+declare var window: Window & typeof globalThis;
 
 declare var dataBuffer: number[];
-declare var dataIndex: number;
 declare var lastNode: any;
 
+import {assert, getValue, getHexString, read, createNode, addDetailsParsing, hex0xValue, createSimpleRow, addHoverValue, addDelayedDetailsParsing, createMemDump, lastOffset, parseInit} from "./parser";
+import {createUlaScreen, getMemBankPermutation, zxColorValue} from './zxspecific';
 
 
 /**
@@ -263,3 +260,18 @@ function parseRoot() {
 	}
 }
 
+
+//---- Handle messages from vscode extension --------
+window.addEventListener('message', event => {
+	const message = event.data;
+
+	switch (message.command) {
+		case 'setData':
+			{
+				// Parse
+				parseInit(message.snaData);
+				// Parse
+				parseRoot();
+			} break;
+	}
+});

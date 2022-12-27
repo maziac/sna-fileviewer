@@ -1,5 +1,4 @@
-//import {ImageConvert} from './imageconvert';
-declare var ImageConvert: any;
+import {ImageConvert} from './imageconvert';
 
 
 /**

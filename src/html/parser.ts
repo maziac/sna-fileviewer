@@ -1,11 +1,4 @@
-declare var acquireVsCodeApi: any;
-declare var document: Document;
-declare var window: Window & typeof globalThis;
-declare var navigator: Navigator;
-declare var ImageConvert: any;
-declare var UlaScreen: any;
-
-const vscode = acquireVsCodeApi();
+import {vscode} from "./vscode-import";
 
 
 /**
@@ -19,16 +12,16 @@ const vscode = acquireVsCodeApi();
 
 
 // The data to parse.
-var dataBuffer: number[];
+export let dataBuffer: number[];
 
 // Index into snaData
-var lastOffset: number;
+export let lastOffset: number;
 
 // The last retrieved data size.
 var lastSize: number;
 
 // The root node for parsing. New objects are appended here.
-var lastNode: any;
+export let lastNode: any;
 
 // The correspondent node for the details.
 var lastContentNode: any;
@@ -51,7 +44,7 @@ var lastLongDescriptionNode: any;
  * Does nothing.
  * You can set a breakpoint here.
  */
-function assert(condition: boolean) {
+export function assert(condition: boolean) {
 	if (!condition) {
 		console.log("Error!");
 	}
@@ -61,7 +54,7 @@ function assert(condition: boolean) {
 /**
  * Convert array to base 64 string.
  */
-function arrayBufferToBase64(buffer) {
+export function arrayBufferToBase64(buffer) {
 	var binary = '';
 	var bytes = [].slice.call(new Uint8Array(buffer));
 	bytes.forEach((b) => binary += String.fromCharCode(b));
@@ -75,7 +68,7 @@ function arrayBufferToBase64(buffer) {
  * @param valString The value to show.
  * @param shortDescription A short description of the entry.
  */
-function createNode(name: string, valString = '', shortDescription = ''): HTMLDetailsElement {
+export function createNode(name: string, valString = '', shortDescription = ''): HTMLDetailsElement {
 	// Create new node
 	const node = document.createElement("DETAILS") as HTMLDetailsElement;
 	node.classList.add("nomarker");
@@ -117,7 +110,7 @@ function createNode(name: string, valString = '', shortDescription = ''): HTMLDe
  * Adds a long description.
  * Will be shown when expanded.
  */
-function addDescription(longDescription: string) {
+export function addDescription(longDescription: string) {
 	//lastLongDescriptionNode.innerHTML = longDescription;
 	beginDetails();
 	createDescription(convertLineBreaks(longDescription));
@@ -161,7 +154,7 @@ function endDetails() {
  * Uses begin/endDetails.
  * @param func The function to call to parse/decode the data.
  */
-function addDetailsParsing(func: () => void) {
+export function addDetailsParsing(func: () => void) {
 	// "Indent"
 	beginDetails();
 	// Call function
@@ -181,7 +174,7 @@ function addDetailsParsing(func: () => void) {
  * The parsing of the data is delayed until toggling.
  * @param func The function to call to parse/decode the data.
  */
-function addDelayedDetailsParsing(func: () => void) {
+export function addDelayedDetailsParsing(func: () => void) {
 	// Get nodex
 	const detailsNode = lastNode.lastChild;
 	detailsNode.classList.remove("nomarker");
@@ -226,7 +219,7 @@ function createDescription(descr: string) {
  * @param valString The value to show.
  * @param shortDescription A short description of the entry.
  */
-function createSimpleRow(name: string, valString = '', shortDescription = '') {
+export function createSimpleRow(name: string, valString = '', shortDescription = '') {
 	// Create new node
 	const node = document.createElement("DETAILS");
 	node.classList.add("nomarker");
@@ -265,7 +258,7 @@ function createSimpleRow(name: string, valString = '', shortDescription = '') {
  * Adds a hover text to lastValueNode.
  * @param hoverValueString String to show on hover for the title. Can be undefined.
  */
-function addHoverValue(hoverValueString: string) {
+export function addHoverValue(hoverValueString: string) {
 	lastValueNode.title = hoverValueString;
 }
 
@@ -276,7 +269,7 @@ function addHoverValue(hoverValueString: string) {
  * @param size The number of digits (e.g. 2 or 4)
  * @returns E.g. "0Fh" or "12FAh"
  */
-function getHexString(value: number, size: number): string {
+export function getHexString(value: number, size: number): string {
 	if (value == undefined)
 		return "".padStart(size, '?');
 	const s = value.toString(16).toUpperCase().padStart(size, '0');
@@ -289,7 +282,7 @@ function getHexString(value: number, size: number): string {
  * stores the size for reading.
  * @param size The number of bytes to read.
  */
-function read(size: number) {
+export function read(size: number) {
 	lastOffset += lastSize;
 	lastSize = size;
 }
@@ -298,7 +291,7 @@ function read(size: number) {
 /**
  * Reads the value from the buffer.
  */
-function getValue(): number {
+export function getValue(): number {
 	let value = dataBuffer[lastOffset];
 	let factor = 1;
 	for (let i = 1; i < lastSize; i++) {
@@ -312,7 +305,7 @@ function getValue(): number {
 /**
  * @returns The value from the dataBuffer as decimal string.
  */
-function decimalValue(): string {
+export function decimalValue(): string {
 	const val = getValue();
 	return val.toString();
 }
@@ -331,7 +324,7 @@ function hexValue(): string {
 /**
  * @returns The value from the dataBuffer as hex string + "0x" in front.
  */
-function hex0xValue(): string {
+export function hex0xValue(): string {
 	return '0x'+hexValue();
 }
 
@@ -340,13 +333,13 @@ function hex0xValue(): string {
  * @param bit The bit to test
  * @returns The bit value (0 or 1) from the dataBuffer as string.
  */
-function bitValue(bit: number): string {
+export function bitValue(bit: number): string {
 	const val = getValue();
 	const result = (val & (1 << bit)) ? '1' : '0';
 	return result;
 }
 
-function keypbitValue(bit: number) {
+export function keypbitValue(bit: number) {
 }
 
 /**
@@ -367,7 +360,7 @@ function convertBitsToString(value: number, size: number): string {
 /**
  * @returns The value from the dataBuffer as bit string. e.g. "0011_0101"
  */
-function bitsValue(): string {
+export function bitsValue(): string {
 	const val = getValue();
 	return convertBitsToString(val, lastSize);
 }
@@ -376,7 +369,7 @@ function bitsValue(): string {
  * Reads a text of given size.
  * @returns The data as string.
  */
-function stringValue(): string {
+export function stringValue(): string {
 	let s = '';
 	for (let i = 0; i < lastSize; i++) {
 		const c = dataBuffer[lastOffset + i];
@@ -392,7 +385,7 @@ function stringValue(): string {
  * @param displayOffset The displayOffset is added to the index before displaying.
  * @param hoverRelativeOffset You can replace the default relative Offset hover text.
  */
-function createMemDump(displayOffset = 0, hoverRelativeOffset = 'Relative Offset') {
+export function createMemDump(displayOffset = 0, hoverRelativeOffset = 'Relative Offset') {
 	let html = '';
 	let prevClose = '';
 
@@ -471,39 +464,23 @@ function createMemDump(displayOffset = 0, hoverRelativeOffset = 'Relative Offset
 /**
  * Starts the parsing.
  */
-function parseStart() {
+export function parseInit(data: number[]) {
 	// Reset
+	dataBuffer = data;
 	lastOffset = 0;
 	lastSize = 0;
 	lastNode = document.getElementById("div_root");
-	// Parse
-	parseRoot();
 }
 
 
 /**
  * Copies the complete html of the document to the clipboard.
  */
-function copyHtmlToClipboard() {
+export function copyHtmlToClipboard() {
 	const copyText = document.documentElement.innerHTML;
 	navigator.clipboard.writeText(copyText);
 }
 
-
-//---- Handle messages from vscode extension --------
-window.addEventListener('message', event => {
-	const message = event.data;
-
-	switch (message.command) {
-		case 'setData':
-			{
-				// Store in global variable
-				dataBuffer = message.snaData;
-				// Parse
-				parseStart();
-			} break;
-	}
-});
 
 // At the end send a message to indicate that the webview is ready to receive
 // data.

@@ -1,6 +1,5 @@
-declare var dataBuffer: number[];
-declare var lastOffset: number;
-declare var lastNode: any;
+import {assert, getValue, getHexString, arrayBufferToBase64, lastOffset, dataBuffer, lastNode} from "./parser";
+import {UlaScreen} from './ulascreen';
 
 
 
@@ -9,7 +8,7 @@ declare var lastNode: any;
  *  5,2,0,1,3,4,6,7,8,9,10,...,111.
  * @returns the bank number 0-111.
  */
-function getMemBankPermutation(i: number): number {
+export function getMemBankPermutation(i: number): number {
 	if (i >= 6)
 		return i;
 	return [5, 2, 0, 1, 3, 4][i];
@@ -20,7 +19,7 @@ function getMemBankPermutation(i: number): number {
 /**
  * Return a ZX color value as a string.
  */
-function zxColorValue() {
+export function zxColorValue() {
 	const val = getValue();
 	switch (val) {
 		case 0: return "BLACK";
@@ -42,7 +41,7 @@ function zxColorValue() {
  * @param bright true/false
  * @returns An array with rgb value, e.g. [255, 0, 0]
  */
-function zxHtmlColor(zxColor: number, bright: boolean): number[] {
+export function zxHtmlColor(zxColor: number, bright: boolean): number[] {
 	if (bright) {
 		switch (zxColor) {
 			case 0: return [ 0, 0, 0 ];	// Black
@@ -79,7 +78,7 @@ function zxHtmlColor(zxColor: number, bright: boolean): number[] {
  * @param blue 0-255
  * @returns Eg. "#00FF00"
  */
-function getHtmlColor(red: number, green: number, blue: number): string {
+export function getHtmlColor(red: number, green: number, blue: number): string {
 	return '#' + getHexString(red, 2) + getHexString(green, 2) + getHexString(blue, 2);
 }
 
@@ -88,7 +87,7 @@ function getHtmlColor(red: number, green: number, blue: number): string {
  * Is called if the user opens the details of for the ULA screen.
  * Decodes the image data
  */
-function createUlaScreen() {
+export function createUlaScreen() {
 	// Image
 	try {
 		// Check size
