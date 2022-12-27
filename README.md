@@ -3,11 +3,11 @@
 If you like the "ZX SNA File Viewer" please consider supporting it.
 
 <a href="https://github.com/sponsors/maziac" title="Github sponsor">
-	<img src="assets/button_donate_sp.png" />
+	<img src="assets/remote/button_donate_sp.png" />
 </a>
 &nbsp;&nbsp;
 <a href="https://www.paypal.com/donate/?hosted_button_id=K6NNLZCTN3UV4&locale.x=en_DE&Z3JncnB0=" title="PayPal">
-	<img src="assets/button_donate_pp.png" />
+	<img src="assets/remote/button_donate_pp.png" />
 </a>
 
 
@@ -32,12 +32,12 @@ The extension is called "ZX SNA File Viewer".
 Just click on a file with the *.sna extension.
 The file is opened and shown in the text editor area.
 
-![](assets/usage.gif)
+![](assets/remote/usage.gif)
 
 Alternatively you can open a SNA file via "Open With...":
 
-![](assets/usage-open-with.gif)
+![](assets/remote/usage-open-with.gif)
 
 When hovering over a value or register name you will get additional info like the offset or the value in decimal:
 
-![](assets/hovering.gif)
+![](assets/remote/hovering.gif)
