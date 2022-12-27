@@ -80,7 +80,8 @@ export class EditorProvider implements vscode.CustomReadonlyEditorProvider {
 	 */
 	protected getMainHtml(webviewPanel) {
 		// Add the html styles etc.
-		const extPath = vscode.extensions.getExtension("maziac.sna-fileviewer")!.extensionPath as string;
+		const extension = vscode.extensions.getExtension("maziac.sna-fileviewer")!;
+		const extPath = extension.extensionPath;
 		const mainHtmlFile = path.join(extPath, 'html/main.html');
 		let mainHtml = readFileSync(mainHtmlFile).toString();
 		// Exchange local path

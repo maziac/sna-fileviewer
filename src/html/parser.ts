@@ -17,11 +17,11 @@ export let dataBuffer: number[];
 // Index into snaData
 export let lastOffset: number;
 
+// The last retrieved data size.
+export let lastSize: number;
+
 // The root node for parsing. New objects are appended here.
 export let lastNode: any;
-
-// The last retrieved data size.
-let lastSize: number;
 
 // The correspondent node for the details.
 let lastContentNode: any;
@@ -33,7 +33,7 @@ let lastNameNode: any;
 let lastValueNode: any;
 
 // The last node used for the short description.
-let lastDescriptionNode: any;
+export let lastDescriptionNode: any;
 
 // The last node used for the long description.
 let lastLongDescriptionNode: any;
@@ -55,11 +55,11 @@ export function assert(condition: boolean) {
  * Convert array to base 64 string.
  */
 export function arrayBufferToBase64(buffer) {
-	var binary = '';
-	var bytes = [].slice.call(new Uint8Array(buffer));
+	let binary = '';
+	const bytes = [].slice.call(new Uint8Array(buffer));
 	bytes.forEach((b) => binary += String.fromCharCode(b));
 	return window.btoa(binary);
-};
+}
 
 
 /**
@@ -288,6 +288,15 @@ export function read(size: number) {
 
 
 /**
+ * Sets lastSize directly (for special cases).
+ * @param size The number of bytes to read.
+ */
+export function setLastSize(size: number) {
+	lastSize = size;
+}
+
+
+/**
  * Reads the value from the buffer.
  */
 export function getValue(): number {
@@ -338,8 +347,6 @@ export function bitValue(bit: number): string {
 	return result;
 }
 
-export function keypbitValue(bit: number) {
-}
 
 /**
  * Converts a value into a bit string.
@@ -352,7 +359,7 @@ function convertBitsToString(value: number, size: number): string {
 	s = s.padStart(size * 8, '0');
 	s = s.replace(/.{4}/g, '$&_');
 	// Remove last '_'
-	s = s.substr(0, s.length - 1);
+	s = s.substring(0, s.length - 1);
 	return s;
 }
 

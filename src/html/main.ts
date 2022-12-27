@@ -257,7 +257,7 @@ function parseRoot() {
 
 
 //---- Handle messages from vscode extension --------
-window.addEventListener('message', event => {
+window.addEventListener('message', event => {	// NOSONAR
 	const message = event.data;
 
 	switch (message.command) {

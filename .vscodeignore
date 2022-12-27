@@ -1,9 +1,11 @@
-.vscode/**
-.vscode-test/**
-out/test/**
+.*/
+node_modules/
+out/tests/**
 test/**
 src/**
 **/*.map
+assets/remote/
+testsna/
 .gitignore
 tsconfig.json
 notes.md

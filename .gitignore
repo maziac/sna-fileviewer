@@ -1,12 +1,11 @@
-.DS_Store
+.*/
 node_modules/
 out/
 dist/
 testsna/
 npm-debug.log
-/*.vsix
+*.vsix
+*.zip
 logs/
 coverage/
-.nyc_output/
-.vscode-test/
 notes.md
