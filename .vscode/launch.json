@@ -10,6 +10,7 @@
                 //"--disable-extensions",
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
+            "debugWebviews": true,
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceFolder}/out/extension.js"
