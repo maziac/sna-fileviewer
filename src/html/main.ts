@@ -39,7 +39,7 @@ function parseRoot() {
 			html += '<div>Banks: 5, 2, ';
 			// Get used bank
 			const port7FFD = dataBuffer[49181];
-			pagedInBank = port7FFD & 0x03;
+			pagedInBank = port7FFD & 0x07;
 			html += pagedInBank.toString();
 			// Remaining banks
 			for (let i = 2; i < 8; i++) {
@@ -169,7 +169,7 @@ function parseRoot() {
 			});
 
 			read(0x4000);
-			createNode("Bank" + pagedInBank.toString() + ": C000-FFFF");
+			createNode("Bank" + pagedInBank.toString() + ": 0xC000-0xFFFF");
 			addDelayedDetailsParsing(() => {
 				read(0x4000);
 				createMemDump(0xC000);

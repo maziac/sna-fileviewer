@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.1
+- Fixed bank (0x7FFD) decoding.
+
 ## 1.5.0
 - Changed to esbuild. Size decreased.
 
