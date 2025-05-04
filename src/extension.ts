@@ -1,8 +1,12 @@
 import * as vscode from 'vscode';
 import {EditorProvider} from './editorprovider';
+import {Usage} from './usage';
 
 
 export function activate(context: vscode.ExtensionContext) {
+    // Activate usage telemetry
+    Usage.init(context);
+
     // Enable logging.
     configure(context);
 
@@ -50,5 +54,4 @@ function configure(context: vscode.ExtensionContext, event?) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
-    //
 }
