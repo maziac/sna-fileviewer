@@ -41,3 +41,8 @@ Alternatively you can open a SNA file via "Open With...":
 When hovering over a value or register name you will get additional info like the offset or the value in decimal:
 
 ![](assets/remote/hovering.gif)
+
+
+# Statistics data
+The extension collects anonymous usage data to help improve its features, performance, and stability.
+The extension respects VS Code’s global telemetry settings. If you disable telemetry in VS Code, this extension will also stop sending data.

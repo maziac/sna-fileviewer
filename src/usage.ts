@@ -4,7 +4,7 @@ import TelemetryReporter from '@vscode/extension-telemetry';
 
 export class Usage {
 	// The connection string for usage statistics.
-	private static connectionString = '...';
+	private static connectionString = process.env.USAGE_CONNECTION as string;
 
 	// The telemetry reporter instance.
 	private static telemetryReporter?: TelemetryReporter;
@@ -17,16 +17,18 @@ export class Usage {
 
 
 	/** Creates a telemetry instance.
-	 * Call this only one in the beginning of the extension 'activate'.
+	 * Call this only once at the start of the extension 'activate'.
 	 * @param context The extension's context.
 	 */
 	public static init(context: vscode.ExtensionContext) {
-		this.context = context;
-		this.activateDeactivate();
-		// Check for changes on the telemetry settings
-		vscode.env.onDidChangeTelemetryEnabled(() => {
+		if (this.connectionString) {
+			this.context = context;
 			this.activateDeactivate();
-		});
+			// Check for changes on the telemetry settings
+			vscode.env.onDidChangeTelemetryEnabled(() => {
+				this.activateDeactivate();
+			});
+		}
 	}
 
 
@@ -79,10 +81,22 @@ export class Usage {
 	}
 
 
-	/** Sends an activation event at start of the extension.
+	/** Sends an activation event when extension is activated.
 	 */
 	private static sendActivated() {
 		this.telemetryReporter?.sendTelemetryEvent('activated', {
+			extensionVersion: this.context.extension.packageJSON.version,
+			os: process.platform,
+			vscodeVersion: vscode.version,
+		});
+	}
+
+
+	/** Dispose. Sends a terminated event when extension is deactivated.
+	 * Note. telemetryReporter is disposed through the context.
+	 */
+	public static dispose() {
+		this.telemetryReporter?.sendTelemetryEvent('terminated', {
 			extensionVersion: this.context.extension.packageJSON.version,
 			os: process.platform,
 			vscodeVersion: vscode.version,

@@ -54,4 +54,5 @@ function configure(context: vscode.ExtensionContext, event?) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
+    Usage.dispose();
 }

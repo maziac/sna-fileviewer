@@ -7,6 +7,7 @@
     "author": {
         "name": "Thomas Busse"
     },
+
     "license": "MIT",
     "keywords": [
         "assembler",
@@ -36,12 +37,6 @@
     },
     "main": "./out/extension",
     "contributes": {
-        "commands": [
-            {
-                "command": "sna-fileviewer.testcommand",
-                "title": "Say Hello with Telemetry (testcommand)"
-            }
-        ],
         "customEditors": [
             {
                 "viewType": "sna-fileviewer.viewer",
@@ -57,11 +52,11 @@
     },
     "scripts": {
         "vscode:prepublish": "npm run esbuild-node -- --minify && npm run esbuild-browser -- --minify",
-        "esbuild-node": "esbuild ./src/extension.ts --bundle --outdir=out --external:vscode --format=cjs --platform=node",
         "esbuild-browser": "esbuild ./src/html/main.ts --bundle --outdir=out/html --platform=browser",
-        "watch-node": "npm run esbuild-node -- --sourcemap --watch",
+        "watch-node": "npm run esbuild-node -- --watch --sourcemap",
         "watch-browser": "npm run esbuild-browser -- --sourcemap --watch",
-        "package": "vsce package"
+        "package": "vsce package",
+        "esbuild-node": "node esbuild-node.config.js"
     },
     "dependencies": {
         "@vscode/extension-telemetry": "^0.9.8",
