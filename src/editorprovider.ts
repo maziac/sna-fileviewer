@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import * as path from 'path';
 import {readFileSync} from 'fs';
 import {EditorDocument} from "./editordocument";
+import {Usage} from "./usage";
 
 
 export class EditorProvider implements vscode.CustomReadonlyEditorProvider {
@@ -11,6 +12,7 @@ export class EditorProvider implements vscode.CustomReadonlyEditorProvider {
 	 * Create document
 	 */
 	public openCustomDocument(uri: vscode.Uri, openContext: vscode.CustomDocumentOpenContext, token: vscode.CancellationToken): vscode.CustomDocument | Thenable<vscode.CustomDocument> {
+		Usage.sendOpenCustomDocument();
 		// Return a SnaDocument
 		const snaDoc = new EditorDocument();
 		snaDoc.uri = uri;

@@ -92,15 +92,18 @@ export class Usage {
 	}
 
 
+	/** Sends an openCustomDocument event when the extension opens a sna file.
+	 */
+	public static sendOpenCustomDocument() {
+		this.telemetryReporter?.sendTelemetryEvent('openCustomDocument');
+	}
+
+
 	/** Dispose. Sends a terminated event when extension is deactivated.
 	 * Note. telemetryReporter is disposed through the context.
 	 */
 	public static dispose() {
-		this.telemetryReporter?.sendTelemetryEvent('terminated', {
-			extensionVersion: this.context.extension.packageJSON.version,
-			os: process.platform,
-			vscodeVersion: vscode.version,
-		});
+		this.telemetryReporter?.sendTelemetryEvent('terminated');
 	}
 
 
