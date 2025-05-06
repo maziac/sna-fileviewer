@@ -2,7 +2,7 @@
     "name": "sna-fileviewer",
     "displayName": "SNA-FileViewer",
     "description": "A viewer for ZX Spectrum snapshot (.sna) files.",
-    "version": "1.5.2-rc1",
+    "version": "1.5.2",
     "publisher": "maziac",
     "author": {
         "name": "Thomas Busse"
