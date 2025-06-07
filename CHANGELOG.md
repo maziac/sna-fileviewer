@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.2
+- Removed usage statistics.
+
+## 1.5.2
+- Usage statistics.
+
 ## 1.5.1
 - Fixed bank (0x7FFD) decoding.
 
