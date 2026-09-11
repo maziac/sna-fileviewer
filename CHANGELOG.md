@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.6.0
+- Added file pattern for *.snx files.
+
 ## 1.5.2
 - Removed usage statistics.
 
