@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.7.0
+- Deprecated
+
 ## 1.6.0
 - Added file pattern for *.snx files.
 
